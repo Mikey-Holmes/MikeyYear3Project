@@ -101,13 +101,20 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 5.0,
+    speed: 1.5,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
     frameCounter: 0,
     direction: "down"
 };
+
+// parkour physics
+let velocityY = 0;
+let gravity = 0.6;
+let jumpPower = -20;
+let isOnGround = false;
+
 
 // keys pressed
 let pressedKeys = {};
@@ -261,12 +268,7 @@ const levels = [
             {x: 1153, y: 590, width: 138, height: 1},
             {x: 1390, y: 544, width: 124, height: 1},
             {x: 1620, y: 523, width: 144, height: 1},
-
-
-            
-
-
-
+            {x: 161, y: 778, width: 1592, height: 2}, //lava wall
         ],
         key: {},
         exitWall: { }
@@ -392,7 +394,28 @@ function update() {
     let nextX = player.x;
     let nextY = player.y;
 
-    // movement for player
+    // movement for level 4
+if (currentLevel === 3) {
+    // left or right only
+    if (pressedKeys["a"]) {
+        nextX -= player.speed;
+        player.direction = "left";
+        moving = true;
+    }
+    if (pressedKeys["d"]) {
+        nextX += player.speed;
+        player.direction = "right";
+        moving = true;
+    }
+
+    // jump is space
+    if (pressedKeys[" "] && isOnGround) {
+        velocityY = jumpPower;
+        isOnGround = false;
+    }
+
+} else {
+    // normal movement for other levels
     if (pressedKeys["w"]) {
         nextY -= player.speed;
         player.direction = "up";
@@ -412,6 +435,12 @@ function update() {
         player.direction = "right";
         moving = true;
     }
+}
+    // gravity for parkour level
+    if (currentLevel === 3) {
+        velocityY += gravity;
+        nextY += velocityY;
+    }
 
         // walking sound
     if (moving) {
@@ -428,8 +457,45 @@ function update() {
     }
 
 
-    // collision with walls
+    // collision with walls for level 4
+if (currentLevel === 3) {
+
+    isOnGround = false;
+
+    for (let wall of walls) {
+        const w = wall.width || wall.size;
+        const h = wall.height || wall.size;
+
+        // horizontal collision
+        if (
+            nextX < wall.x + w &&
+            nextX + player.size > wall.x &&
+            player.y < wall.y + h &&
+            player.y + player.size > wall.y
+        ) {
+            nextX = player.x;
+        }
+
+        // landing on platform
+        if (
+            player.x < wall.x + w &&
+            player.x + player.size > wall.x &&
+            nextY + player.size > wall.y &&
+            player.y + player.size <= wall.y
+        ) {
+            nextY = wall.y - player.size;
+            velocityY = 0;
+            isOnGround = true;
+        }
+    }
+
+    player.x = nextX;
+    player.y = nextY;
+
+} else {
+    // wall collision lvls other than 4
     let hitWall = false;
+
     for (let wall of walls) {
         if (
             nextX < wall.x + (wall.width || wall.size) &&
@@ -446,6 +512,7 @@ function update() {
         player.x = nextX;
         player.y = nextY;
     }
+}
 
     // player animation
     if (moving) {
@@ -646,6 +713,15 @@ if (!invincible && currentLevel === 2) {
                     currentLevel = levels.length - 1; // stay on last level
                 }
 
+        }
+    }
+
+    // lava death (level 4)
+    if (currentLevel === 3) {
+        if (player.y + player.size >= 778) { // lava Y
+            player.x = 177;
+            player.y = 474;
+            velocityY = 0;
         }
     }
 }
