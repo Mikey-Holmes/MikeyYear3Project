@@ -252,10 +252,21 @@ const levels = [
     {
     backgroundSrc: "assets/images/background4.png",
         walls: [
-            { },
-            {  },
-            { },
-            { }
+            {x: 137, y: 375, width: 1, height: 163},
+            {x: 149, y: 549, width: 142, height: 2},
+            {x: 408, y: 550, width: 150, height: 1},
+            {x: 672, y: 550, width: 128, height: 2},
+            {x: 675, y: 550, width: 119, height: 1},
+            {x: 908, y: 589, width: 124, height: 1},
+            {x: 1153, y: 590, width: 138, height: 1},
+            {x: 1390, y: 544, width: 124, height: 1},
+            {x: 1620, y: 523, width: 144, height: 1},
+
+
+            
+
+
+
         ],
         key: {},
         exitWall: { }
@@ -700,12 +711,18 @@ function draw() {
 
     if (debugMode) {
     ctx.save();
-    ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
+    ctx.strokeStyle = "red";       // outline color
+    ctx.lineWidth = 2;             // thickness
+
     for (let wall of walls) {
-        ctx.fillRect(wall.x, wall.y, wall.width , wall.size, wall.height , wall.size);
-    }
-    ctx.restore();
-}
+            const w = wall.width ?? wall.size;
+            const h = wall.height ?? wall.size;
+
+            ctx.strokeRect(wall.x, wall.y, w, h);
+        }
+        ctx.restore();
+    }   
+
 
 // show live dragging wall
 if (currentDrag) {
