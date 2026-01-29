@@ -101,7 +101,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 1.5,
+    speed: 5.0,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -130,6 +130,19 @@ let health = 3; // player health
 let invincible = false;
 
 let showEnding = false; //end screen
+
+// animated lava for level 4
+const lavaFrames = [];
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/lava_" + i + ".png";
+    lavaFrames.push(img);
+}
+
+let lavaFrameIndex = 0;
+let lavaFrameCounter = 0;
+let lavaFrameDelay = 20;
+
 
 
 // levels definition
@@ -257,9 +270,9 @@ const levels = [
     },
 
     {
-    backgroundSrc: "assets/images/background4.png",
+    backgroundSrc: "assets/images/background4nolava.png",//background without lava
         walls: [
-            {x: 137, y: 375, width: 1, height: 163},
+            {x: 138, y: 144, width: 1, height: 395},
             {x: 149, y: 549, width: 142, height: 2},
             {x: 408, y: 550, width: 150, height: 1},
             {x: 672, y: 550, width: 128, height: 2},
@@ -453,6 +466,20 @@ if (currentLevel === 3) {
         // stop sound when player stops moving
         if (!walkingSound.paused) {
             walkingSound.pause();
+        }
+    }
+
+    // animate lava background (level 4)
+    if (currentLevel === 3) {
+        lavaFrameCounter++;
+
+        if (lavaFrameCounter >= lavaFrameDelay) {
+            lavaFrameCounter = 0;
+            lavaFrameIndex++;
+
+            if (lavaFrameIndex >= lavaFrames.length) {
+                lavaFrameIndex = 0;
+            }
         }
     }
 
@@ -769,10 +796,34 @@ canvas.addEventListener("mouseup", (e) => {
 function draw() {
     ctx.imageSmoothingEnabled = false;
 
-    // draw the background first
-    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    // draw background if loaded
+    if (background.complete) {
+        ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+    } else {
+        // so screen isn't white when error loading
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
 
-    
+
+    // draw lava strip 
+    if (
+        currentLevel === 3 &&
+        lavaFrames[lavaFrameIndex] &&
+        lavaFrames[lavaFrameIndex].complete //loading check
+    ) {
+        const lavaHeight = 105;//hardcoded lava height
+        const lavaY = 692;//hardcoded lava y position
+
+        const lavaWidth = canvas.width - 285; // squash image inwards
+        const lavaX = (canvas.width - lavaWidth) / 2; // center the lava
+
+        ctx.drawImage(
+            lavaFrames[lavaFrameIndex],//draw animated lava
+            lavaX, lavaY,
+            lavaWidth, lavaHeight
+        );
+    }
 
     // draw keys
     if (key.spawned && !key.collected) {
