@@ -141,7 +141,7 @@ for (let i = 1; i <= 4; i++) {
 
 let lavaFrameIndex = 0;
 let lavaFrameCounter = 0;
-let lavaFrameDelay = 20;
+let lavaFrameDelay = 40;
 
 
 
