@@ -1,11 +1,26 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-// resize canvas
+const GAME_WIDTH = 1920; // fixed game resolution
+const GAME_HEIGHT = 1080;
+
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // work out scale based on screen size
+    const scaleX = window.innerWidth / GAME_WIDTH;
+    const scaleY = window.innerHeight / GAME_HEIGHT;
+
+    // use smaller scale to keep aspect ratio
+    const scale = Math.min(scaleX, scaleY);
+
+    // scale canvas visually
+    canvas.style.width = GAME_WIDTH * scale + "px";
+    canvas.style.height = GAME_HEIGHT * scale + "px";
+
+    // keep internal canvas resolution fixed
+    canvas.width = GAME_WIDTH;
+    canvas.height = GAME_HEIGHT;
 }
+
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
@@ -101,7 +116,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 8.0,
+    speed: 10.0,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -152,123 +167,134 @@ const levels = [
     {
         backgroundSrc: "assets/images/background.png",
         walls: [
-            { x: 118, y: 371, width: 32, height: 397 },//boundary walls array
-            { x: 149, y: 358, width: 161, height: 22 },
-            { x: 310, y: 244, width: 13, height: 134 },
-            { x: 331, y: 224, width: 169, height: 28 },
-            { x: 493, y: 73, width: 8, height: 148 },
-            { x: 515, y: 71, width: 457, height: 13 },
-            { x: 976, y: 91, width: 16, height: 69 },
-            { x: 997, y: 154, width: 334, height: 12 },
-            { x: 1330, y: 160, width: 15, height: 142 },
-            { x: 1349, y: 305, width: 257, height: 12 },
-            { x: 1606, y: 327, width: 13, height: 84 },
-            { x: 1625, y: 401, width: 135, height: 22 },
-            { x: 1759, y: 429, width: 11, height: 169 },
-            { x: 1615, y: 602, width: 140, height: 10 },
-            { x: 1610, y: 614, width: 4, height: 140 },
-            { x: 1187, y: 758, width: 418, height: 15 },
-            { x: 1175, y: 775, width: 8, height: 89 },
-            { x: 630, y: 860, width: 543, height: 7 },
-            { x: 622, y: 778, width: 7, height: 81 },
-            { x: 147, y: 773, width: 473, height: 8 },
+            {x: 125, y: 429, width: 2, height: 452},//boundary walls array
+            {x: 135, y: 422, width: 164, height: 4},
+            {x: 300, y: 266, width: 2, height: 153},
+            {x: 306, y: 263, width: 182, height: 4},
+            {x: 312, y: 276, width: 6, height: 6},
+            {x: 488, y: 83, width: 2, height: 179},
+            {x: 498, y: 92, width: 6, height: 8},    
+            {x: 512, y: 80, width: 485, height: 3},
+            {x: 998, y: 84, width: 2, height: 94},
+            {x: 1002, y: 183, width: 358, height: 3},
+            {x: 1356, y: 187, width: 4, height: 170},
+            {x: 1363, y: 355, width: 265, height: 3},
+            {x: 1631, y: 358, width: 1, height: 115},
+            {x: 1636, y: 471, width: 139, height: 1},
+            {x: 1780, y: 473, width: 1, height: 216},
+            {x: 1634, y: 685, width: 146, height: 2},
+            {x: 1632, y: 689, width: 3, height: 188},
+            {x: 1214, y: 866, width: 413, height: 1},
+            {x: 1194, y: 878, width: 4, height: 107},
+            {x: 623, y: 982, width: 572, height: 3},
+            {x: 619, y: 883, width: 1, height: 101},
+            {x: 131, y: 876, width: 486, height: 6},
+            
 
-            { x: 177, y: 417, width: 93, height: 30},//inside barriers
-            { x: 356, y: 264, width: 144, height: 33},
-            { x: 1027, y: 386, width: 140, height: 54},
-            { x: 891, y: 110, width: 80, height: 60},
-            { x: 981, y: 182, width: 51, height: 36},
-            { x: 1198, y: 223, width: 96, height: 29},
-            { x: 947, y: 582, width: 45, height: 40},
-            { x: 1534, y: 352, width: 50, height: 44},
-            { x: 1509, y: 699, width: 59, height: 43},
-            { x: 868, y: 769, width: 97, height: 23},
-            { x: 1025, y: 787, width: 99, height: 21},
-            { x: 649, y: 796, width: 41, height: 40},
+            {x: 1079, y: 442, width: 72, height: 50},//inside barriers
+            {x: 1032, y: 428, width: 14, height: 20},
+            {x: 952, y: 655, width: 60, height: 58},
+            {x: 650, y: 899, width: 52, height: 52},
+            {x: 143, y: 649, width: 38, height: 78},
+            {x: 179, y: 477, width: 94, height: 25},
+            {x: 883, y: 874, width: 86, height: 19},
+            {x: 1029, y: 891, width: 104, height: 23},
+            {x: 1520, y: 797, width: 48, height: 43},
+            {x: 909, y: 135, width: 56, height: 62},
+            {x: 992, y: 211, width: 39, height: 36},
+            {x: 1206, y: 255, width: 82, height: 26},
+            {x: 1551, y: 400, width: 35, height: 39},
+            {x: 351, y: 306, width: 155, height: 26},
+            {x: 352, y: 333, width: 36, height: 15},
+            
+            
+
         ],
         key: { x: 800, y: 200, size: 30, collected: false },//key postion
-        exitWall: { x: 1759, y: 429, width: 50, height: 169 }//exit wall location
+        exitWall: {x: 1780, y: 473, width: 1, height: 216}//exit wall location
     },
     {
         backgroundSrc: "assets/images/background2.png",
         walls: [
-            { x: 242, y: 533, width: 9, height: 81},//boundary walls array lvl 2
-            { x: 239, y: 524, width: 68, height: 7},
-            { x: 312, y: 227, width: 7, height: 297},
-            { x: 318, y: 224, width: 122, height: 3},
-            { x: 471, y: 235, width: 2, height: 127},
-            { x: 471, y: 372, width: 78, height: 1},
-            { x: 548, y: 221, width: 6, height: 147},
-            { x: 556, y: 220, width: 129, height: 8},
-            { x: 705, y: 222, width: 5, height: 142},
-            { x: 709, y: 362, width: 253, height: 13},
-            { x: 957, y: 388, width: 4, height: 54},
-            { x: 466, y: 452, width: 491, height: 10},
-            { x: 467, y: 463, width: 3, height: 66},
-            { x: 470, y: 527, width: 752, height: 3},
-            { x: 1220, y: 532, width: 4, height: 84},
-            { x: 1131, y: 618, width: 92, height: 3},
-            { x: 1131, y: 620, width: 2, height: 50},
-            { x: 1134, y: 669, width: 164, height: 1},
-            { x: 1306, y: 458, width: 3, height: 208},
-            { x: 1064, y: 454, width: 245, height: 4},
-            { x: 1059, y: 378, width: 3, height: 62},
-            { x: 1069, y: 373, width: 231, height: 4},
-            { x: 1298, y: 326, width: 3, height: 47},
-            { x: 769, y: 321, width: 525, height: 4},
-            { x: 762, y: 223, width: 2, height: 88},
-            { x: 770, y: 215, width: 850, height: 4},
-            { x: 1639, y: 219, width: 4, height: 180},
-            { x: 1645, y: 396, width: 50, height: 11},
-            { x: 1700, y: 410, width: 3, height: 74},
-            { x: 1526, y: 489, width: 155, height: 6},
-            { x: 1512, y: 327, width: 3, height: 156},
-            { x: 1454, y: 324, width: 47, height: 4},
-            { x: 1453, y: 328, width: 3, height: 198},
-            { x: 1454, y: 526, width: 165, height: 5},
-            { x: 1616, y: 534, width: 3, height: 73},
-            { x: 1455, y: 616, width: 161, height: 2},
-            { x: 1455, y: 616, width: 2, height: 53},
-            { x: 1457, y: 669, width: 150, height: 5},
-            { x: 1622, y: 678, width: 3, height: 82},
-            { x: 295, y: 764, width: 1314, height: 5},
-            { x: 286, y: 683, width: 6, height: 74},
-            { x: 292, y: 665, width: 664, height: 8},
-            { x: 954, y: 621, width: 6, height: 45},
-            { x: 231, y: 616, width: 724, height: 11},
+            {x: 249, y: 592, width: 2, height: 108},//boundary walls array lvl 2
+            {x: 255, y: 598, width: 69, height: 2},
+            {x: 322, y: 237, width: 4, height: 361},
+            {x: 332, y: 245, width: 139, height: 3},
+            {x: 471, y: 248, width: 3, height: 173},
+            {x: 477, y: 415, width: 81, height: 4},
+            {x: 558, y: 239, width: 2, height: 175},
+            {x: 568, y: 247, width: 145, height: 3},
+            {x: 712, y: 255, width: 3, height: 166},
+            {x: 719, y: 424, width: 264, height: 1},
+            {x: 990, y: 419, width: 1, height: 93},
+            {x: 477, y: 511, width: 519, height: 1},
+            {x: 475, y: 509, width: 4, height: 92},
+            {x: 482, y: 600, width: 778, height: 1},
+            {x: 1258, y: 601, width: 3, height: 96},
+            {x: 1155, y: 698, width: 103, height: 4},
+            {x: 1150, y: 703, width: 2, height: 61},
+            {x: 1152, y: 761, width: 166, height: 3},
+            {x: 1317, y: 517, width: 1, height: 243},
+            {x: 1079, y: 513, width: 236, height: 4},
+            {x: 1075, y: 419, width: 3, height: 97},
+            {x: 1077, y: 423, width: 241, height: 3},
+            {x: 1313, y: 367, width: 4, height: 55},
+            {x: 780, y: 366, width: 532, height: 4},
+            {x: 777, y: 235, width: 3, height: 131},
+            {x: 790, y: 242, width: 858, height: 4},
+            {x: 1646, y: 247, width: 2, height: 209},
+            {x: 1649, y: 458, width: 48, height: 3},
+            {x: 1710, y: 468, width: 1, height: 82},
+            {x: 1531, y: 552, width: 180, height: 2},
+            {x: 1520, y: 366, width: 4, height: 186},
+            {x: 1471, y: 361, width: 53, height: 6},
+            {x: 1467, y: 361, width: 4, height: 241},
+            {x: 1473, y: 601, width: 180, height: 2},
+            {x: 1651, y: 602, width: 2, height: 91},
+            {x: 1469, y: 694, width: 185, height: 1},
+            {x: 1468, y: 696, width: 4, height: 68},
+            {x: 1472, y: 762, width: 168, height: 2},
+            {x: 1642, y: 764, width: 3, height: 99},
+            {x: 302, y: 864, width: 1343, height: 2},
+            {x: 297, y: 758, width: 5, height: 105},
+            {x: 305, y: 757, width: 669, height: 6},
+            {x: 971, y: 698, width: 3, height: 62},
+            {x: 247, y: 697, width: 722, height: 2}
+        
+            
         ],
-        key: { x: 1110, y: 413, size: 30, collected: false },//key position
-        exitWall: { x: 1688, y: 408, width: 5, height: 76}//exit wall location
+        key: { x: 1110, y: 450, size: 30, collected: false },//key position
+        exitWall: {x: 1710, y: 468, width: 1, height: 82}//exit wall location
     },
 
     {
         backgroundSrc: "assets/images/background_3.png",
         walls: [
-            { x: 196, y: 337, width: 7, height: 306},//boundary walls array lvl 3
-            { x: 209, y: 323, width: 220, height: 4},
-            { x: 429, y: 210, width: 6, height: 113},
-            { x: 440, y: 209, width: 216, height: 7},
-            { x: 656, y: 92, width: 3, height: 116},
-            { x: 664, y: 94, width: 597, height: 3},
-            { x: 1253, y: 98, width: 2, height: 117},
-            { x: 1257, y: 213, width: 228, height: 7},
-            { x: 1480, y: 221, width: 5, height: 108},
-            { x: 1487, y: 329, width: 225, height: 3},
-            { x: 1712, y: 332, width: 5, height: 316},
-            {x: 1486, y: 643, width: 227, height: 2},
-            {x: 1481, y: 643, width: 5, height: 113},
-            {x: 1258, y: 754, width: 223, height: 2},
-            {x: 1255, y: 754, width: 3, height: 108},
-            {x: 660, y: 861, width: 595, height: 3},
-            {x: 660, y: 763, width: 3, height: 98},
-            {x: 436, y: 758, width: 217, height: 7},
-            {x: 430, y: 651, width: 6, height: 107},
-            {x: 204, y: 644, width: 226, height: 7},
+            {x: 197, y: 370, width: 4, height: 357},//boundary walls array lvl 3
+            {x: 206, y: 371, width: 228, height: 6},
+            {x: 432, y: 247, width: 2, height: 127},
+            {x: 437, y: 245, width: 222, height: 4},
+            {x: 659, y: 109, width: 2, height: 140},
+            {x: 665, y: 109, width: 600, height: 6},
+            {x: 1261, y: 114, width: 4, height: 134},
+            {x: 1268, y: 247, width: 220, height: 2},
+            {x: 1486, y: 251, width: 4, height: 121},
+            {x: 1485, y: 370, width: 236, height: 9},
+            {x: 1725, y: 380, width: 4, height: 345},
+            {x: 1490, y: 726, width: 241, height: 1},
+            {x: 1488, y: 728, width: 2, height: 128},
+            {x: 1263, y: 852, width: 225, height: 6},
+            {x: 1260, y: 856, width: 3, height: 122},
+            {x: 660, y: 974, width: 600, height: 4},
+            {x: 659, y: 857, width: 1, height: 114},
+            {x: 432, y: 851, width: 226, height: 7},
+            {x: 430, y: 732, width: 5, height: 119},
+            {x: 190, y: 725, width: 242, height: 10},
 
         ],
-        key: { x: 1110, y: 413, size: 30, collected: false },//key position
+        key: { x: 1110, y: 443, size: 30, collected: false },//key position
         bow: { x: 800, y: 450, size: 60, collected: false },//bow position
-        exitWall: { x: 1712, y: 332, width: 5, height: 316}
+        exitWall: {x: 1725, y: 380, width: 4, height: 345}
     },
 
     {
@@ -339,8 +365,8 @@ function loadLevel(levelIndex) {
         player.y = 474;
     }
     else {
-        player.x = 250;
-        player.y = 550;
+        player.x = 291;
+        player.y = 625;
     }
 
     bow = level.bow || null;
@@ -574,9 +600,9 @@ if (currentLevel === 3) {
         bow.collected = true;
 
         if (currentLevel === 2) {
-            enemy1 = { x: 1518, y: 368, startX: 1518, startY: 388, size: 70, speed: 0.2, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
-            enemy2 = { x: 1518, y: 456, startX: 1518, startY: 476, size: 70, speed: 0.5, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
-            enemy3 = { x: 1518, y: 547, startX: 1518, startY: 587, size: 55, speed: 1, frameX: 0, maxFrame: 4, frameCounter: 0, frameDelay: 10 };
+            enemy1 = { x: 1518, y: 398, startX: 1518, startY: 398, size: 70, speed: 0.2, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
+            enemy2 = { x: 1518, y: 506, startX: 1518, startY: 506, size: 70, speed: 0.5, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
+            enemy3 = { x: 1518, y: 597, startX: 1518, startY: 597, size: 55, speed: 1, frameX: 0, maxFrame: 4, frameCounter: 0, frameDelay: 10 };
         }
     }
 
@@ -765,16 +791,26 @@ canvas.addEventListener("mousedown", (e) => {
     if (gameState !== "playing") return;
     isDragging = true;
     const rect = canvas.getBoundingClientRect();
-    dragStart.x = e.clientX - rect.left;
-    dragStart.y = e.clientY - rect.top;
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    dragStart.x = Math.round((e.clientX - rect.left) * scaleX);
+    dragStart.y = Math.round((e.clientY - rect.top) * scaleY);
+
+
     currentDrag = { x: dragStart.x, y: dragStart.y, width: 0, height: 0 };
 });
 
 canvas.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
     const rect = canvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
+    
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const currentX = Math.round((e.clientX - rect.left) * scaleX);
+    const currentY = Math.round((e.clientY - rect.top) * scaleY);
 
     currentDrag = {
         x: Math.min(dragStart.x, currentX),
@@ -841,7 +877,7 @@ function draw() {
 
     if (debugMode) {
     ctx.save();
-    ctx.strokeStyle = "red";       // outline color
+    ctx.strokeStyle = "red";  // outline color
     ctx.lineWidth = 2;             // thickness
 
     for (let wall of walls) {

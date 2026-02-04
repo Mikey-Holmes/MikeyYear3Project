@@ -6,11 +6,17 @@ html, body {
     font-family: Arial, sans-serif;
     overflow: hidden;
     color: white;
+    background: black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
 }
 
 canvas {
     display: block;
-    z-index: 1;
+    background: black;
 }
 
 #menu, #controlsMenu {
