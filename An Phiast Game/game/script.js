@@ -814,8 +814,9 @@ function draw() {
         lavaFrames[lavaFrameIndex] &&
         lavaFrames[lavaFrameIndex].complete //loading check
     ) {
-        const lavaHeight = 105;//hardcoded lava height
-        const lavaY = 692;//hardcoded lava y position
+        const lavaHeight = 105;
+        const lavaRaiseAmount = 158;
+        const lavaY = canvas.height - lavaHeight - lavaRaiseAmount; // raise lava and set sprite hight
 
         const lavaWidth = canvas.width - 285; // squash image inwards
         const lavaX = (canvas.width - lavaWidth) / 2; // center the lava
