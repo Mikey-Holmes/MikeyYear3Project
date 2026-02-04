@@ -101,7 +101,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 5.0,
+    speed: 8.0,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -111,8 +111,8 @@ let player = {
 
 // parkour physics
 let velocityY = 0;
-let gravity = 0.6;
-let jumpPower = -20;
+let gravity = 0.7;
+let jumpPower = -10;
 let isOnGround = false;
 
 
@@ -143,6 +143,8 @@ let lavaFrameIndex = 0;
 let lavaFrameCounter = 0;
 let lavaFrameDelay = 40;
 
+
+let lastTime = 0; // for delta time
 
 
 // levels definition
@@ -402,7 +404,7 @@ function animateEnemy(enemy) {
     }
 }
 
-function update() {
+function update(deltaTime) {
     let moving = false;
     let nextX = player.x;
     let nextY = player.y;
@@ -411,12 +413,12 @@ function update() {
 if (currentLevel === 3) {
     // left or right only
     if (pressedKeys["a"]) {
-        nextX -= player.speed;
+        nextX -= player.speed * deltaTime;
         player.direction = "left";
         moving = true;
     }
     if (pressedKeys["d"]) {
-        nextX += player.speed;
+        nextX += player.speed * deltaTime;
         player.direction = "right";
         moving = true;
     }
@@ -430,29 +432,29 @@ if (currentLevel === 3) {
 } else {
     // normal movement for other levels
     if (pressedKeys["w"]) {
-        nextY -= player.speed;
+        nextY -= player.speed * deltaTime;
         player.direction = "up";
         moving = true;
     } else if (pressedKeys["s"]) {
-        nextY += player.speed;
+        nextY += player.speed * deltaTime;
         player.direction = "down";
         moving = true;
     }
 
     if (pressedKeys["a"]) {
-        nextX -= player.speed;
+        nextX -= player.speed * deltaTime;
         player.direction = "left";
         moving = true;
     } else if (pressedKeys["d"]) {
-        nextX += player.speed;
+        nextX += player.speed * deltaTime;
         player.direction = "right";
         moving = true;
     }
 }
     // gravity for parkour level
     if (currentLevel === 3) {
-        velocityY += gravity;
-        nextY += velocityY;
+        velocityY += gravity * deltaTime;
+        nextY += velocityY * deltaTime;
     }
 
         // walking sound
@@ -604,10 +606,10 @@ if (currentLevel === 3) {
 
     // move arrow and handle collisions
     if (arrow) {
-        if (arrow.direction === "right") arrow.x += arrow.speed;
-        else if (arrow.direction === "left") arrow.x -= arrow.speed;
-        else if (arrow.direction === "up") arrow.y -= arrow.speed;
-        else if (arrow.direction === "down") arrow.y += arrow.speed;
+        if (arrow.direction === "right") arrow.x += arrow.speed * deltaTime;
+        else if (arrow.direction === "left") arrow.x -= arrow.speed * deltaTime;
+        else if (arrow.direction === "up") arrow.y -= arrow.speed * deltaTime;
+        else if (arrow.direction === "down") arrow.y += arrow.speed * deltaTime;
 
         // collision with walls
         for (let w of walls) {
@@ -651,8 +653,8 @@ if (currentLevel === 3) {
         let dy = player.y - enemy.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
         if (dist > 0) {
-            enemy.x += (dx / dist) * enemy.speed;
-            enemy.y += (dy / dist) * enemy.speed;
+            enemy.x += (dx / dist) * enemy.speed * deltaTime; 
+            enemy.y += (dy / dist) * enemy.speed * deltaTime; 
         }
     }
 
@@ -821,7 +823,7 @@ function draw() {
         ctx.drawImage(
             lavaFrames[lavaFrameIndex],//draw animated lava
             lavaX, lavaY,
-            lavaWidth, lavaHeight
+            lavaWidth, lavaHeight 
         );
     }
 
@@ -1063,13 +1065,16 @@ function endGameSplashes() {
 }
 
 // main loop
-function gameLoop() {
+function gameLoop(time) {
+    const deltaTime = (time - lastTime) / 16.67;// for consistent movement across different devices
+    lastTime = time;
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (gameState === "playing") {// if game playing update and draw
-        update();
+    if (gameState === "playing") {
+        update(deltaTime);
         draw();
-        hint.style.display = "block"; // show hint in game
+        hint.style.display = "block";
     } else {
         hint.style.display = "none";
     }
