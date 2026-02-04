@@ -300,16 +300,18 @@ const levels = [
     {
     backgroundSrc: "assets/images/background4nolava.png",//background without lava
         walls: [
-            {x: 138, y: 144, width: 1, height: 395},
-            {x: 149, y: 549, width: 142, height: 2},
-            {x: 408, y: 550, width: 150, height: 1},
-            {x: 672, y: 550, width: 128, height: 2},
-            {x: 675, y: 550, width: 119, height: 1},
-            {x: 908, y: 589, width: 124, height: 1},
-            {x: 1153, y: 590, width: 138, height: 1},
-            {x: 1390, y: 544, width: 124, height: 1},
-            {x: 1620, y: 523, width: 144, height: 1},
-            {x: 161, y: 778, width: 1592, height: 2}, //lava wall
+            {x: 132, y: 418, width: 3, height: 194},
+            {x: 145, y: 619, width: 152, height: 3},
+            {x: 406, y: 618, width: 150, height: 4},
+            {x: 672, y: 620, width: 124, height: 3},
+            {x: 912, y: 667, width: 119, height: 2},
+            {x: 1158, y: 667, width: 137, height: 3},
+            {x: 1400, y: 613, width: 119, height: 6},
+            {x: 1632, y: 585, width: 143, height: 2},
+            {x: 1796, y: 406, width: 3, height: 176},
+
+            {x: 160, y: 860, width: 1604, height: 3},// lava hit box
+   
         ],
         key: {},
         exitWall: { }
@@ -362,7 +364,7 @@ function loadLevel(levelIndex) {
 
     if (levelIndex === 3) {
         player.x = 177;
-        player.y = 474;
+        player.y = 540;
     }
     else {
         player.x = 291;
@@ -773,7 +775,7 @@ if (!invincible && currentLevel === 2) {
 
     // lava death (level 4)
     if (currentLevel === 3) {
-        if (player.y + player.size >= 778) { // lava Y
+        if (player.y + player.size >= 860) { // lava Y
             player.x = 177;
             player.y = 474;
             velocityY = 0;
@@ -851,7 +853,7 @@ function draw() {
         lavaFrames[lavaFrameIndex].complete //loading check
     ) {
         const lavaHeight = 105;
-        const lavaRaiseAmount = 158;
+        const lavaRaiseAmount = 187;
         const lavaY = canvas.height - lavaHeight - lavaRaiseAmount; // raise lava and set sprite hight
 
         const lavaWidth = canvas.width - 285; // squash image inwards
