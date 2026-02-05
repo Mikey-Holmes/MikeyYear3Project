@@ -126,8 +126,8 @@ let player = {
 
 // parkour physics
 let velocityY = 0;
-let gravity = 0.7;
-let jumpPower = -10;
+let gravity = 0.8;
+let jumpPower = -15;
 let isOnGround = false;
 
 
@@ -160,6 +160,12 @@ let lavaFrameDelay = 40;
 
 
 let lastTime = 0; // for delta time
+
+const patrolBatSprite = new Image();
+patrolBatSprite.src = "assets/images/bat.png"; //bat temporary sprite
+
+let patrolBat = null;
+
 
 
 // levels definition
@@ -391,7 +397,30 @@ function loadLevel(levelIndex) {
     enemy3 = null;
     updateHintText();
 
-    
+
+    patrolBat = null;
+
+if (levelIndex === 3) {
+
+    patrolBat = {
+        x: 1721,
+        y: 510,
+
+        startX: 1721,
+        endX: 155,
+
+        size: 100,
+        speed: 8,
+
+        direction: "left",
+
+        frameX: 0,
+        maxFrame: 4,
+        frameCounter: 0,
+        frameDelay: 10
+    };
+}
+
 }
 
 //load first level
@@ -613,6 +642,30 @@ if (currentLevel === 3) {
     if (enemy2) { moveEnemy(enemy2); animateEnemy(enemy2); }
     if (enemy3) { moveEnemy(enemy3); animateEnemy(enemy3); }
 
+
+    if (patrolBat && currentLevel === 3) {
+
+        // movement
+        if (patrolBat.direction === "left") {
+            patrolBat.x -= patrolBat.speed * deltaTime;
+        } else {
+            patrolBat.x += patrolBat.speed * deltaTime;
+        }
+
+        // turn around
+        if (patrolBat.x <= patrolBat.endX) {
+            patrolBat.direction = "right";
+        }
+
+        if (patrolBat.x >= patrolBat.startX) {
+            patrolBat.direction = "left";
+        }
+
+        // animate
+        animateEnemy(patrolBat);
+    }
+
+
     // shoot arrow if bow collected
     if (bow && bow.collected && pressedKeys[" "] && !arrow) {
         let arrowSpeed = 12;
@@ -772,6 +825,32 @@ if (!invincible && currentLevel === 2) {
 
         }
     }
+
+    // enemy collision level 4
+    if (currentLevel === 3 && patrolBat) {
+
+    const level4PlayerHitbox = {
+        x: player.x + 15,
+        y: player.y + 15,
+        size: player.size - 30
+    };
+
+    const level4BatHitbox = {
+        x: patrolBat.x + 20,
+        y: patrolBat.y + 20,
+        size: patrolBat.size - 40
+    };
+
+    if (isColliding(level4PlayerHitbox, level4BatHitbox)) {
+
+        player.x = 177;
+        player.y = 540;
+
+        velocityY = 0;
+    }
+ }
+
+
 
     // lava death (level 4)
     if (currentLevel === 3) {
@@ -957,6 +1036,50 @@ if (enemy3) {
         enemy3.x, enemy3.y, enemy3.size, enemy3.size
     );
 }
+
+if (patrolBat) {
+
+    const frameWidth = patrolBatSprite.width / (patrolBat.maxFrame + 1);
+    const frameHeight = patrolBatSprite.height;
+
+    ctx.save();
+
+    // flip when moving right
+    if (patrolBat.direction === "right") {
+
+        ctx.translate(patrolBat.x + patrolBat.size, patrolBat.y);
+        ctx.scale(-1, 1);
+
+        ctx.drawImage(
+            patrolBatSprite,
+            patrolBat.frameX * frameWidth,
+            0,
+            frameWidth,
+            frameHeight,
+            0,
+            0,
+            patrolBat.size,
+            patrolBat.size
+        );
+
+    } else {
+
+        ctx.drawImage(
+            patrolBatSprite,
+            patrolBat.frameX * frameWidth,
+            0,
+            frameWidth,
+            frameHeight,
+            patrolBat.x,
+            patrolBat.y,
+            patrolBat.size,
+            patrolBat.size
+        );
+    }
+
+    ctx.restore();
+}
+
 
     // draw score only for level 3
     if (currentLevel === 2) {
