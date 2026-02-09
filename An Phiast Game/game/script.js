@@ -166,6 +166,9 @@ patrolBatSprite.src = "assets/images/bat.png"; //bat temporary sprite
 
 let patrolBat = null;
 
+let wasTouchingExit = false;// to see if player was touching exit to prevent instant level change
+
+
 
 
 // levels definition
@@ -304,7 +307,7 @@ const levels = [
     },
 
     {
-    backgroundSrc: "assets/images/background4nolava.png",//background without lava
+    backgroundSrc: "assets/images/background4nolava.png",//background lvl 4
         walls: [
             {x: 132, y: 418, width: 3, height: 194},
             {x: 145, y: 619, width: 152, height: 3},
@@ -324,16 +327,26 @@ const levels = [
     },
 
     {
-    backgroundSrc: "assets/images/caveTwo.png",//background 
+    backgroundSrc: "assets/images/caveTwo.png",//background lvl 5
         walls: [
             {x: 132, y: 418, width: 3, height: 194},
             {x: 144, y: 619, width: 175, height: 3},
             {x: 534, y: 702, width: 140, height: 3},
             {x: 859, y: 653, width: 141, height: 4},
-             {x: 1243, y: 640, width: 171, height: 3},
-             {x: 1608, y: 586, width: 167, height: 5},
-             {x: 1788, y: 434, width: 5, height: 143},
+            {x: 1243, y: 640, width: 171, height: 3},
+            {x: 1608, y: 586, width: 167, height: 5},
+            {x: 1788, y: 434, width: 5, height: 143},
 
+        ],
+        key: {},
+        exitWall: {x: 1788, y: 434, width: 5, height: 143}
+    },
+
+    {
+    backgroundSrc: "assets/images/caveThree.png",//background lvl 6
+        walls: [
+            {x: 132, y: 418, width: 3, height: 194},
+            {x: 144, y: 619, width: 175, height: 3},
         ],
         key: {},
         exitWall: {}
@@ -823,25 +836,33 @@ if (!invincible && currentLevel === 2) {
 
 
     // level completion
-if (
-    (currentLevel === 3 && isColliding(player, exitHitbox)) || // no key for level 4
-    (currentLevel !== 3 && key.collected && isColliding(player, exitHitbox))
-) {
-    levelCompleteSound.currentTime = 0;
-    levelCompleteSound.play();
+    const touchingExit = isColliding(player, exitHitbox); // prevent instant level completion
 
-    currentLevel++;
+    if (
+        touchingExit &&
+        !wasTouchingExit &&
+        (
+            (currentLevel === 3 || currentLevel === 4) ||
+            (key.collected)
+        )
+    ) {
+        levelCompleteSound.currentTime = 0;
+        levelCompleteSound.play();
 
-    if (currentLevel < levels.length) {
-        loadLevel(currentLevel);
-    } else {
-        if (showEnding) {
-            endGameSplashes();
+        currentLevel++;
+
+        if (currentLevel < levels.length) {
+            loadLevel(currentLevel);
         } else {
-            currentLevel = levels.length - 1;
+            if (showEnding) {
+                endGameSplashes();
+            } else {
+                currentLevel = levels.length - 1;
+            }
         }
     }
-}
+
+    wasTouchingExit = touchingExit;
 
     // enemy collision level 4 smaller hitboxes 
     if (currentLevel === 3 && patrolBat) {
@@ -944,7 +965,7 @@ function draw() {
 
     // draw lava strip 
     if (
-        currentLevel === 3 || currentLevel === 4 &&
+        (currentLevel === 3 || currentLevel === 4) &&
         lavaFrames[lavaFrameIndex] &&
         lavaFrames[lavaFrameIndex].complete //loading check
     ) {
