@@ -320,7 +320,23 @@ const levels = [
    
         ],
         key: {},
-        exitWall: { }
+        exitWall: {x: 1796, y: 406, width: 3, height: 176}
+    },
+
+    {
+    backgroundSrc: "assets/images/caveTwo.png",//background 
+        walls: [
+            {x: 132, y: 418, width: 3, height: 194},
+            {x: 144, y: 619, width: 175, height: 3},
+            {x: 534, y: 702, width: 140, height: 3},
+            {x: 859, y: 653, width: 141, height: 4},
+             {x: 1243, y: 640, width: 171, height: 3},
+             {x: 1608, y: 586, width: 167, height: 5},
+             {x: 1788, y: 434, width: 5, height: 143},
+
+        ],
+        key: {},
+        exitWall: {}
     }
 
     
@@ -369,6 +385,10 @@ function loadLevel(levelIndex) {
     }
 
     if (levelIndex === 3) {
+        player.x = 177;
+        player.y = 540;
+    }
+    else if (levelIndex === 4) {
         player.x = 177;
         player.y = 540;
     }
@@ -467,7 +487,7 @@ function update(deltaTime) {
     let nextY = player.y;
 
     // movement for level 4
-if (currentLevel === 3) {
+if (currentLevel === 3 || currentLevel === 4) {
     // left or right only
     if (pressedKeys["a"]) {
         nextX -= player.speed * deltaTime;
@@ -509,7 +529,7 @@ if (currentLevel === 3) {
     }
 }
     // gravity for parkour level
-    if (currentLevel === 3) {
+    if (currentLevel === 3 || currentLevel === 4) {
         velocityY += gravity * deltaTime;
         nextY += velocityY * deltaTime;
     }
@@ -544,7 +564,7 @@ if (currentLevel === 3) {
 
 
     // collision with walls for level 4
-if (currentLevel === 3) {
+if (currentLevel === 3 || currentLevel === 4) {
 
     isOnGround = false;
 
@@ -661,10 +681,9 @@ if (currentLevel === 3) {
             patrolBat.direction = "left";
         }
 
-        // animate
+        // animate the enemy
         animateEnemy(patrolBat);
     }
-
 
     // shoot arrow if bow collected
     if (bow && bow.collected && pressedKeys[" "] && !arrow) {
@@ -802,31 +821,29 @@ if (!invincible && currentLevel === 2) {
     const exit = levels[currentLevel].exitWall;
     const exitHitbox = { x: exit.x - 10, y: exit.y - 10, width: exit.width + 20, height: exit.height + 20 };
 
+
     // level completion
-    if (key.collected && isColliding(player, exitHitbox)) {
+if (
+    (currentLevel === 3 && isColliding(player, exitHitbox)) || // no key for level 4
+    (currentLevel !== 3 && key.collected && isColliding(player, exitHitbox))
+) {
+    levelCompleteSound.currentTime = 0;
+    levelCompleteSound.play();
 
-        levelCompleteSound.currentTime = 0;
-        levelCompleteSound.play();
+    currentLevel++;
 
-        currentLevel++;
-        
     if (currentLevel < levels.length) {
-        console.log("Level complete, next level load");
         loadLevel(currentLevel);
-    } 
-    else {
-            if (showEnding) {
-                endGameSplashes();
-            } 
-                else {
-                    console.log("Ending disabled");
-                    currentLevel = levels.length - 1; // stay on last level
-                }
-
+    } else {
+        if (showEnding) {
+            endGameSplashes();
+        } else {
+            currentLevel = levels.length - 1;
         }
     }
+}
 
-    // enemy collision level 4
+    // enemy collision level 4 smaller hitboxes 
     if (currentLevel === 3 && patrolBat) {
 
     const level4PlayerHitbox = {
@@ -852,8 +869,8 @@ if (!invincible && currentLevel === 2) {
 
 
 
-    // lava death (level 4)
-    if (currentLevel === 3) {
+    // lava death level 4 AND 5
+    if (currentLevel === 3 || currentLevel === 4) {
         if (player.y + player.size >= 860) { // lava Y
             player.x = 177;
             player.y = 474;
@@ -1063,7 +1080,7 @@ if (patrolBat) {
         );
 
     } else {
-
+        //draws enemy as normal when moving left
         ctx.drawImage(
             patrolBatSprite,
             patrolBat.frameX * frameWidth,
