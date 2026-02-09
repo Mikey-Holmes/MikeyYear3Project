@@ -549,7 +549,7 @@ if (currentLevel === 3 || currentLevel === 4) {
     }
 
     // animate lava background (level 4)
-    if (currentLevel === 3) {
+    if (currentLevel === 3 || currentLevel === 4) {
         lavaFrameCounter++;
 
         if (lavaFrameCounter >= lavaFrameDelay) {
@@ -944,7 +944,7 @@ function draw() {
 
     // draw lava strip 
     if (
-        currentLevel === 3 &&
+        currentLevel === 3 || currentLevel === 4 &&
         lavaFrames[lavaFrameIndex] &&
         lavaFrames[lavaFrameIndex].complete //loading check
     ) {
