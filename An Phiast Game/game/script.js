@@ -397,17 +397,15 @@ function loadLevel(levelIndex) {
         key.spawned = true; // key visible normally for other levels
     }
 
-    if (levelIndex === 3) {
-        player.x = 177;
-        player.y = 540;
-    }
-    else if (levelIndex === 4) {
-        player.x = 177;
-        player.y = 540;
-    }
-    else {
-        player.x = 291;
-        player.y = 625;
+    //spawn points for player in different levels
+    if (levelIndex === 3 || levelIndex === 4 || levelIndex === 5) {
+    // parkour levels (4, 5, 6)
+    player.x = 177;
+    player.y = 540;
+    } else {
+    // normal levels
+    player.x = 291;
+    player.y = 625;
     }
 
     bow = level.bow || null;
@@ -500,7 +498,7 @@ function update(deltaTime) {
     let nextY = player.y;
 
     // movement for level 4
-if (currentLevel === 3 || currentLevel === 4) {
+if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // left or right only
     if (pressedKeys["a"]) {
         nextX -= player.speed * deltaTime;
@@ -542,7 +540,7 @@ if (currentLevel === 3 || currentLevel === 4) {
     }
 }
     // gravity for parkour level
-    if (currentLevel === 3 || currentLevel === 4) {
+    if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         velocityY += gravity * deltaTime;
         nextY += velocityY * deltaTime;
     }
@@ -562,7 +560,7 @@ if (currentLevel === 3 || currentLevel === 4) {
     }
 
     // animate lava background (level 4)
-    if (currentLevel === 3 || currentLevel === 4) {
+    if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         lavaFrameCounter++;
 
         if (lavaFrameCounter >= lavaFrameDelay) {
@@ -577,7 +575,7 @@ if (currentLevel === 3 || currentLevel === 4) {
 
 
     // collision with walls for level 4
-if (currentLevel === 3 || currentLevel === 4) {
+if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
     isOnGround = false;
 
@@ -842,7 +840,7 @@ if (!invincible && currentLevel === 2) {
         touchingExit &&
         !wasTouchingExit &&
         (
-            (currentLevel === 3 || currentLevel === 4) ||
+            (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) ||
             (key.collected)
         )
     ) {
@@ -891,7 +889,7 @@ if (!invincible && currentLevel === 2) {
 
 
     // lava death level 4 AND 5
-    if (currentLevel === 3 || currentLevel === 4) {
+    if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         if (player.y + player.size >= 860) { // lava Y
             player.x = 177;
             player.y = 474;
@@ -965,7 +963,7 @@ function draw() {
 
     // draw lava strip 
     if (
-        (currentLevel === 3 || currentLevel === 4) &&
+        (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) &&
         lavaFrames[lavaFrameIndex] &&
         lavaFrames[lavaFrameIndex].complete //loading check
     ) {
