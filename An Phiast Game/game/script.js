@@ -357,7 +357,7 @@ const levels = [
     backgroundSrc: "assets/images/caveThree.png",//background lvl 6
         walls: [
             {x: 132, y: 418, width: 3, height: 194},
-            {x: 144, y: 619, width: 175, height: 3},
+            {x: 144, y: 585, width: 175, height: 3},
         ],
         key: {},
         exitWall: {}
@@ -409,12 +409,18 @@ function loadLevel(levelIndex) {
     }
 
     //spawn points for player in different levels
-    if (levelIndex === 3 || levelIndex === 4 || levelIndex === 5) {
-    // parkour levels (4, 5, 6)
+    //for level 4 and 5
+    if (levelIndex === 3 || levelIndex === 4) {
     player.x = 177;
     player.y = 540;
-    } else {
-    // normal levels
+    } 
+    //spawn for level 6
+    else if (levelIndex === 5) {
+    player.x = 177;
+    player.y = 520;
+    }
+    else {
+    //first three levels so far
     player.x = 291;
     player.y = 625;
     }
