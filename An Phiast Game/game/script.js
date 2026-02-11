@@ -161,12 +161,23 @@ let lavaFrameDelay = 40;
 
 let lastTime = 0; // for delta time
 
-const patrolBatSprite = new Image();
-patrolBatSprite.src = "assets/images/bat.png"; //bat temporary sprite
-
-let patrolBat = null;
-
 let wasTouchingExit = false;// to see if player was touching exit to prevent instant level change
+
+// level 4 bat animation frames
+const batLevelFourFrames = [];
+
+for (let i = 1; i <= 6; i++) {
+    const img = new Image();
+    img.src = "assets/images/bat4_" + i + ".png";
+    batLevelFourFrames.push(img);
+}
+
+let batLevelFourFrameIndex = 0;
+let batLevelFourFrameCounter = 0;
+let batLevelFourFrameDelay = 8; // adjust speed
+let batLevelFour = null;
+
+
 
 
 
@@ -307,7 +318,7 @@ const levels = [
     },
 
     {
-    backgroundSrc: "assets/images/background4nolava.png",//background lvl 4
+    backgroundSrc: "assets/images/caveOne.png",//background lvl 4
         walls: [
             {x: 132, y: 418, width: 3, height: 194},
             {x: 145, y: 619, width: 152, height: 3},
@@ -428,29 +439,23 @@ function loadLevel(levelIndex) {
     enemy3 = null;
     updateHintText();
 
+    // spawn level 4 bat
+    if (levelIndex === 3) {
+        batLevelFour = {
+            x: 1721,
+            y: 510,
+            startX: 1721,
+            endX: 155,
+            size: 100,
+            speed: 8,
+            direction: "left"
+        };
 
-    patrolBat = null;
-
-if (levelIndex === 3) {
-
-    patrolBat = {
-        x: 1721,
-        y: 510,
-
-        startX: 1721,
-        endX: 155,
-
-        size: 100,
-        speed: 8,
-
-        direction: "left",
-
-        frameX: 0,
-        maxFrame: 4,
-        frameCounter: 0,
-        frameDelay: 10
-    };
-}
+        batLevelFourFrameIndex = 0;
+        batLevelFourFrameCounter = 0;
+    } else {
+        batLevelFour = null;
+    }
 
 }
 
@@ -673,28 +678,37 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     if (enemy2) { moveEnemy(enemy2); animateEnemy(enemy2); }
     if (enemy3) { moveEnemy(enemy3); animateEnemy(enemy3); }
 
-
-    if (patrolBat && currentLevel === 3) {
+    // level 4 bat movement + lava-style animation
+    if (batLevelFour && currentLevel === 3) {
 
         // movement
-        if (patrolBat.direction === "left") {
-            patrolBat.x -= patrolBat.speed * deltaTime;
+        if (batLevelFour.direction === "left") {
+            batLevelFour.x -= batLevelFour.speed * deltaTime;
         } else {
-            patrolBat.x += patrolBat.speed * deltaTime;
+            batLevelFour.x += batLevelFour.speed * deltaTime;
         }
 
         // turn around
-        if (patrolBat.x <= patrolBat.endX) {
-            patrolBat.direction = "right";
+        if (batLevelFour.x <= batLevelFour.endX) {
+            batLevelFour.direction = "right";
+        }
+        if (batLevelFour.x >= batLevelFour.startX) {
+            batLevelFour.direction = "left";
         }
 
-        if (patrolBat.x >= patrolBat.startX) {
-            patrolBat.direction = "left";
-        }
+        // animation for bat
+        batLevelFourFrameCounter++;
 
-        // animate the enemy
-        animateEnemy(patrolBat);
+        if (batLevelFourFrameCounter >= batLevelFourFrameDelay) {
+            batLevelFourFrameCounter = 0;
+            batLevelFourFrameIndex++;
+
+            if (batLevelFourFrameIndex >= batLevelFourFrames.length) {
+                batLevelFourFrameIndex = 0;
+            }
+        }
     }
+
 
     // shoot arrow if bow collected
     if (bow && bow.collected && pressedKeys[" "] && !arrow) {
@@ -862,29 +876,27 @@ if (!invincible && currentLevel === 2) {
 
     wasTouchingExit = touchingExit;
 
-    // enemy collision level 4 smaller hitboxes 
-    if (currentLevel === 3 && patrolBat) {
+    // level 4 bat collision
+    if (batLevelFour && currentLevel === 3) {
 
-    const level4PlayerHitbox = {
-        x: player.x + 15,
-        y: player.y + 15,
-        size: player.size - 30
-    };
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
 
-    const level4BatHitbox = {
-        x: patrolBat.x + 20,
-        y: patrolBat.y + 20,
-        size: patrolBat.size - 40
-    };
+        const batHitbox = {
+            x: batLevelFour.x + 20,
+            y: batLevelFour.y + 20,
+            size: batLevelFour.size - 40
+        };
 
-    if (isColliding(level4PlayerHitbox, level4BatHitbox)) {
-
-        player.x = 177;
-        player.y = 540;
-
-        velocityY = 0;
+        if (isColliding(playerHitbox, batHitbox)) {
+            player.x = 177;
+            player.y = 540;
+            velocityY = 0;
+        }
     }
- }
 
 
 
@@ -968,7 +980,7 @@ function draw() {
         lavaFrames[lavaFrameIndex].complete //loading check
     ) {
         const lavaHeight = 105;
-        const lavaRaiseAmount = 187;
+        const lavaRaiseAmount = 180;
         const lavaY = canvas.height - lavaHeight - lavaRaiseAmount; // raise lava and set sprite hight
 
         const lavaWidth = canvas.width - 285; // squash image inwards
@@ -1073,48 +1085,39 @@ if (enemy3) {
     );
 }
 
-if (patrolBat) {
+    // draw level 4 bat
+    if (
+        batLevelFour &&
+        batLevelFourFrames[batLevelFourFrameIndex] &&
+        batLevelFourFrames[batLevelFourFrameIndex].complete
+    ) {
+        ctx.save();
 
-    const frameWidth = patrolBatSprite.width / (patrolBat.maxFrame + 1);
-    const frameHeight = patrolBatSprite.height;
+        // flip when moving right
+        if (batLevelFour.direction === "right") {
+            ctx.translate(batLevelFour.x + batLevelFour.size, batLevelFour.y);
+            ctx.scale(-1, 1);
 
-    ctx.save();
+            ctx.drawImage(
+                batLevelFourFrames[batLevelFourFrameIndex],
+                0,
+                0,
+                batLevelFour.size,
+                batLevelFour.size
+            );
+        } else {
+            ctx.drawImage(
+                batLevelFourFrames[batLevelFourFrameIndex],
+                batLevelFour.x,
+                batLevelFour.y,
+                batLevelFour.size,
+                batLevelFour.size
+            );
+        }
 
-    // flip when moving right
-    if (patrolBat.direction === "right") {
-
-        ctx.translate(patrolBat.x + patrolBat.size, patrolBat.y);
-        ctx.scale(-1, 1);
-
-        ctx.drawImage(
-            patrolBatSprite,
-            patrolBat.frameX * frameWidth,
-            0,
-            frameWidth,
-            frameHeight,
-            0,
-            0,
-            patrolBat.size,
-            patrolBat.size
-        );
-
-    } else {
-        //draws enemy as normal when moving left
-        ctx.drawImage(
-            patrolBatSprite,
-            patrolBat.frameX * frameWidth,
-            0,
-            frameWidth,
-            frameHeight,
-            patrolBat.x,
-            patrolBat.y,
-            patrolBat.size,
-            patrolBat.size
-        );
+        ctx.restore();
     }
 
-    ctx.restore();
-}
 
 
     // draw score only for level 3
