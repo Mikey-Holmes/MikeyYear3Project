@@ -177,8 +177,10 @@ let batLevelFourFrameCounter = 0;
 let batLevelFourFrameDelay = 8; // adjust speed
 let batLevelFour = null;
 
-
-
+//level 6 first moving platform
+const movingPlatformSprite = new Image();
+movingPlatformSprite.src = "assets/images/movingrock1.png";
+let movingPlatform1 = null;
 
 
 
@@ -356,7 +358,7 @@ const levels = [
     {
     backgroundSrc: "assets/images/caveThree.png",//background lvl 6
         walls: [
-            {x: 132, y: 418, width: 3, height: 194},
+            {x: 132, y: 400, width: 3, height: 194},
             {x: 144, y: 585, width: 175, height: 3},
         ],
         key: {},
@@ -462,6 +464,38 @@ function loadLevel(levelIndex) {
     } else {
         batLevelFour = null;
     }
+
+
+    movingPlatform1 = {
+        // base position for sprite + hitbox
+        baseX: 400,
+        x: 400,
+        y: 650,
+
+        // hitbox 
+        width: 40,
+        height: 20,
+
+        // sprite scale
+        spriteScale: 0.5,
+
+        // movement
+        startX: 400,
+        endX: 900,
+        speed: 3,
+        direction: "right"
+    };
+
+
+
+    // calculate sprite draw width from image + scale
+    const spriteDrawWidth =
+    movingPlatformSprite.width * movingPlatform1.spriteScale;
+
+    // center hitbox under the sprite
+    movingPlatform1.x =
+    movingPlatform1.baseX +
+    (spriteDrawWidth - movingPlatform1.width) / 2;
 
 }
 
@@ -642,6 +676,31 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     }
 }
 
+        // collision with moving platform 1
+    if (currentLevel === 5 && movingPlatform1) {
+        const p = movingPlatform1;
+
+        if (
+            player.x < p.x + p.width &&
+            player.x + player.size > p.x &&
+            player.y + player.size <= p.y + 10 &&
+            nextY + player.size >= p.y
+        ) {
+            // keep player on platform
+            player.y = p.y - player.size;
+            velocityY = 0;
+            isOnGround = true;
+
+            // carry player with platform
+            if (p.direction === "right") {
+                player.x += p.speed * deltaTime;
+            } else {
+                player.x -= p.speed * deltaTime;
+            }
+        }
+    }
+
+
     // player animation
     if (moving) {
         player.frameCounter++;
@@ -714,6 +773,23 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             }
         }
     }
+
+    // move platform 1 lvl 6
+    if (currentLevel === 5 && movingPlatform1) {
+        if (movingPlatform1.direction === "right") {
+            movingPlatform1.x += movingPlatform1.speed * deltaTime;
+        } else {
+            movingPlatform1.x -= movingPlatform1.speed * deltaTime;
+        }
+        // turn around
+        if (movingPlatform1.x >= movingPlatform1.endX) {
+            movingPlatform1.direction = "left";
+        }
+        if (movingPlatform1.x <= movingPlatform1.startX) {
+            movingPlatform1.direction = "right";
+        }
+    }
+
 
 
     // shoot arrow if bow collected
@@ -848,13 +924,21 @@ if (!invincible && currentLevel === 2) {
         console.log("Key has spawned!");
     }
 
-    // exit wall collision
     const exit = levels[currentLevel].exitWall;
-    const exitHitbox = { x: exit.x - 10, y: exit.y - 10, width: exit.width + 20, height: exit.height + 20 };
 
+    let touchingExit = false;
 
-    // level completion
-    const touchingExit = isColliding(player, exitHitbox); // prevent instant level completion
+    if (exit && exit.width && exit.height) {
+        const exitHitbox = {
+            x: exit.x - 10,
+            y: exit.y - 10,
+            width: exit.width + 20,
+            height: exit.height + 20
+        };
+
+        touchingExit = isColliding(player, exitHitbox);
+    }
+
 
     if (
         touchingExit &&
@@ -1050,6 +1134,42 @@ if (currentDrag) {
     ctx.drawImage(arrowSprite, -arrow.width / 2, -arrow.height / 2, arrow.width, arrow.height);
     ctx.restore();
     }
+
+    // draw moving platform 1 level 6
+if (currentLevel === 5 && movingPlatform1 && movingPlatformSprite.complete) {
+
+    const scale = movingPlatform1.spriteScale;
+    // calculate draw size from sprite + scale
+    const drawWidth  = movingPlatformSprite.width  * scale;
+    const drawHeight = movingPlatformSprite.height * scale;
+
+    const spriteYOffset = 36; // moves sprite down to line up with hitbox
+
+    // center sprite on hitbox
+    const spriteX =
+        movingPlatform1.x - (drawWidth - movingPlatform1.width) / 2;
+
+    const spriteY =
+        movingPlatform1.y - (drawHeight - movingPlatform1.height) + spriteYOffset;
+
+    ctx.drawImage(
+        movingPlatformSprite,
+        spriteX,
+        spriteY,
+        drawWidth,
+        drawHeight
+    );
+}
+
+        //moving platform hitbox colour
+        ctx.strokeStyle = "cyan";
+        ctx.strokeRect(
+        movingPlatform1.x,
+        movingPlatform1.y,
+        movingPlatform1.width,
+        movingPlatform1.height
+    );
+
     // draw player sprite
     const sprite = sprites[player.direction];
     const frameWidth = sprite.width / (player.maxFrame + 1);
@@ -1245,8 +1365,6 @@ function endGameSplashes() {
 
     // stop the game after credits appear
     setTimeout(() => {
-        // freeze the game
-        cancelAnimationFrame(gameLoop);
         pressedKeys = {};
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
