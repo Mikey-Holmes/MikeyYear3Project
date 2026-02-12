@@ -192,6 +192,12 @@ const movingPlatform3Sprite = new Image();
 movingPlatform3Sprite.src = "assets/images/movingrock3.png";
 let movingPlatform3 = null;
 
+// level 6 fourth moving platform sprite
+const movingPlatform4Sprite = new Image();
+movingPlatform4Sprite.src = "assets/images/movingrock4.png";
+let movingPlatform4 = null;
+
+
 
 
 
@@ -372,6 +378,7 @@ const levels = [
             {x: 132, y: 400, width: 3, height: 194},
             {x: 144, y: 586, width: 146, height: 3},
             {x: 1617, y: 615, width: 158, height: 3},
+            {x: 1782, y: 392, width: 4, height: 215},
 
         ],
         key: {},
@@ -518,7 +525,7 @@ function loadLevel(levelIndex) {
     };
 
 
-        // third moving platform
+        //third moving platform
         movingPlatform3 = {
         x: 900,
         y: 500,  
@@ -534,6 +541,23 @@ function loadLevel(levelIndex) {
         speed: 3,
         direction: "right"
     };
+
+        //fourth moving platform
+        movingPlatform4 = {
+        x: movingPlatform3.endX + 50, //to the right of platform 3 end point on X axis      
+        y: movingPlatform3.y + 150, //below platform 3
+
+        width: 40,
+        height: 20,
+
+        spriteScale: 0.5,
+
+        startX: movingPlatform3.endX + 50, // start here
+        endX: movingPlatform3.endX + 400, // move further right
+        speed: 3,
+        direction: "right"
+    };
+
 
 
     // calculate sprite draw width from image + scale
@@ -790,6 +814,29 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+        //collision with moving platform 4
+    if (currentLevel === 5 && movingPlatform4) {
+        const p = movingPlatform4;
+
+        if (
+            velocityY >= 0 &&
+            player.x < p.x + p.width &&
+            player.x + player.size > p.x &&
+            player.y + player.size <= p.y + 10 &&
+            nextY + player.size >= p.y
+        ) {
+            player.y = p.y - player.size;
+            velocityY = 0;
+            isOnGround = true;
+
+            // carry player horizontally again
+            if (p.direction === "right") {
+                player.x += p.speed * deltaTime;
+            } else {
+                player.x -= p.speed * deltaTime;
+            }
+        }
+    }
 
 
 
@@ -919,6 +966,23 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             movingPlatform3.direction = "right";
         }
     }
+
+    // move platform 4 lvl 6
+    if (currentLevel === 5 && movingPlatform4) {
+        if (movingPlatform4.direction === "right") {
+            movingPlatform4.x += movingPlatform4.speed * deltaTime;
+        } else {
+            movingPlatform4.x -= movingPlatform4.speed * deltaTime;
+        }
+
+        if (movingPlatform4.x >= movingPlatform4.endX) {
+            movingPlatform4.direction = "left";
+        }
+        if (movingPlatform4.x <= movingPlatform4.startX) {
+            movingPlatform4.direction = "right";
+        }
+    }
+
 
 
 
@@ -1368,6 +1432,40 @@ if (currentDrag) {
             movingPlatform3.height
         );
     }
+
+    // draw moving platform 4 level 6
+    if (currentLevel === 5 && movingPlatform4 && movingPlatform4Sprite.complete) {
+
+        const scale = movingPlatform4.spriteScale;
+        const drawWidth  = movingPlatform4Sprite.width * scale;
+        const drawHeight = movingPlatform4Sprite.height * scale;
+
+        const spriteYOffset = 44; // moves sprite down
+
+        const spriteX =
+            movingPlatform4.x - (drawWidth - movingPlatform4.width) / 2;
+
+        const spriteY =
+            movingPlatform4.y - (drawHeight - movingPlatform4.height) + spriteYOffset;
+
+        ctx.drawImage(
+            movingPlatform4Sprite,
+            spriteX,
+            spriteY,
+            drawWidth,
+            drawHeight
+        );
+
+        // debug hitbox
+        ctx.strokeStyle = "cyan";
+        ctx.strokeRect(
+            movingPlatform4.x,
+            movingPlatform4.y,
+            movingPlatform4.width,
+            movingPlatform4.height
+        );
+    }
+
 
 
     // draw player sprite
