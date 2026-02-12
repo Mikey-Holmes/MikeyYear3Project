@@ -116,7 +116,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 10.0,
+    speed: 6.0,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -181,6 +181,17 @@ let batLevelFour = null;
 const movingPlatformSprite = new Image();
 movingPlatformSprite.src = "assets/images/movingrock1.png";
 let movingPlatform1 = null;
+
+// level 6 second moving platform sprite
+const movingPlatform2Sprite = new Image();
+movingPlatform2Sprite.src = "assets/images/movingrock2.png";
+let movingPlatform2 = null;
+
+// level 6 third moving platform sprite
+const movingPlatform3Sprite = new Image();
+movingPlatform3Sprite.src = "assets/images/movingrock3.png";
+let movingPlatform3 = null;
+
 
 
 
@@ -359,13 +370,13 @@ const levels = [
     backgroundSrc: "assets/images/caveThree.png",//background lvl 6
         walls: [
             {x: 132, y: 400, width: 3, height: 194},
-            {x: 144, y: 585, width: 175, height: 3},
+            {x: 144, y: 586, width: 146, height: 3},
+            {x: 1617, y: 615, width: 158, height: 3},
+
         ],
         key: {},
-        exitWall: {}
+        exitWall: {x: 1782, y: 392, width: 4, height: 215}
     }
-
-    
 ];
 
 const hintBox = document.getElementById("hintBox");// hint box element
@@ -481,11 +492,48 @@ function loadLevel(levelIndex) {
 
         // movement
         startX: 400,
-        endX: 900,
+        endX: 600,
         speed: 3,
         direction: "right"
     };
 
+        // level 6 second moving platform 
+        movingPlatform2 = {
+        x: movingPlatform1.endX + 120, // to the right of platform 1
+        y: movingPlatform1.y,
+        baseY: movingPlatform1.y,
+
+        // hitbox
+        width: 40,
+        height: 20,
+
+        // sprite scale
+        spriteScale: 0.5,
+
+        // vertical movement
+        startY: movingPlatform1.y,
+        endY: movingPlatform1.y - 180, // how high it goes
+        speed: 2,
+        direction: "up"
+    };
+
+
+        // third moving platform
+        movingPlatform3 = {
+        x: 900,
+        y: 500,  
+
+        //hitbox
+        width: 40,
+        height: 20,
+
+        spriteScale: 0.5,
+
+        startX: 900,
+        endX: 1150,
+        speed: 3,
+        direction: "right"
+    };
 
 
     // calculate sprite draw width from image + scale
@@ -700,6 +748,51 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+        // collision with moving platform 2
+    if (currentLevel === 5 && movingPlatform2) {
+        const p = movingPlatform2;
+
+        if (
+            velocityY >= 0 &&
+            player.x < p.x + p.width &&
+            player.x + player.size > p.x &&
+            player.y + player.size <= p.y + 10 &&
+            nextY + player.size >= p.y
+        ) {
+            player.y = p.y - player.size;
+            velocityY = 0;
+            isOnGround = true;
+        }
+    }
+
+       // collision with moving platform 3
+    if (currentLevel === 5 && movingPlatform3) {
+        const p = movingPlatform3;
+
+        if (
+            velocityY >= 0 &&
+            player.x < p.x + p.width &&
+            player.x + player.size > p.x &&
+            player.y + player.size <= p.y + 10 &&
+            nextY + player.size >= p.y
+        ) {
+            player.y = p.y - player.size;
+            velocityY = 0;
+            isOnGround = true;
+            standingOnPlatform = true;
+
+            // carry player horizontally
+            if (p.direction === "right") {
+                player.x += p.speed * deltaTime;
+            } else {
+                player.x -= p.speed * deltaTime;
+            }
+        }
+    }
+
+
+
+
 
     // player animation
     if (moving) {
@@ -789,6 +882,44 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             movingPlatform1.direction = "right";
         }
     }
+
+    // move platform 2 lvl 6 
+    if (currentLevel === 5 && movingPlatform2) {
+
+        if (movingPlatform2.direction === "up") {
+            movingPlatform2.y -= movingPlatform2.speed * deltaTime;
+        } else {
+            movingPlatform2.y += movingPlatform2.speed * deltaTime;
+        }
+
+        if (movingPlatform2.y <= movingPlatform2.endY) {
+            movingPlatform2.direction = "down";
+        }
+
+        if (movingPlatform2.y >= movingPlatform2.startY) {
+            movingPlatform2.direction = "up";
+        }
+    }
+
+    // move platform 3 lvl 6
+    if (currentLevel === 5 && movingPlatform3) {
+
+        if (movingPlatform3.direction === "right") {
+            movingPlatform3.x += movingPlatform3.speed * deltaTime;
+        } else {
+            movingPlatform3.x -= movingPlatform3.speed * deltaTime;
+        }
+
+        // turn around
+        if (movingPlatform3.x >= movingPlatform3.endX) {
+            movingPlatform3.direction = "left";
+        }
+
+        if (movingPlatform3.x <= movingPlatform3.startX) {
+            movingPlatform3.direction = "right";
+        }
+    }
+
 
 
 
@@ -1135,40 +1266,109 @@ if (currentDrag) {
     ctx.restore();
     }
 
-    // draw moving platform 1 level 6
-if (currentLevel === 5 && movingPlatform1 && movingPlatformSprite.complete) {
+        // draw moving platform 1 level 6
+    if (currentLevel === 5 && movingPlatform1 && movingPlatformSprite.complete) {
 
-    const scale = movingPlatform1.spriteScale;
-    // calculate draw size from sprite + scale
-    const drawWidth  = movingPlatformSprite.width  * scale;
-    const drawHeight = movingPlatformSprite.height * scale;
+        const scale = movingPlatform1.spriteScale;
+        // calculate draw size from sprite + scale
+        const drawWidth  = movingPlatformSprite.width  * scale;
+        const drawHeight = movingPlatformSprite.height * scale;
 
-    const spriteYOffset = 36; // moves sprite down to line up with hitbox
+        const spriteYOffset = 36; // moves sprite down to line up with hitbox
 
-    // center sprite on hitbox
-    const spriteX =
-        movingPlatform1.x - (drawWidth - movingPlatform1.width) / 2;
+        // center sprite on hitbox
+        const spriteX =
+            movingPlatform1.x - (drawWidth - movingPlatform1.width) / 2;
 
-    const spriteY =
-        movingPlatform1.y - (drawHeight - movingPlatform1.height) + spriteYOffset;
+        const spriteY =
+            movingPlatform1.y - (drawHeight - movingPlatform1.height) + spriteYOffset;
 
-    ctx.drawImage(
-        movingPlatformSprite,
-        spriteX,
-        spriteY,
-        drawWidth,
-        drawHeight
-    );
-}
+        ctx.drawImage(
+            movingPlatformSprite,
+            spriteX,
+            spriteY,
+            drawWidth,
+            drawHeight
+        );
 
-        //moving platform hitbox colour
+        // debug hitbox
+        ctx.strokeRect(
+            movingPlatform1.x,
+            movingPlatform1.y,
+            movingPlatform1.width,
+            movingPlatform1.height
+        );
+
+    }
+
+    // draw moving platform 2 level 6
+    if (currentLevel === 5 && movingPlatform2 && movingPlatform2Sprite.complete) {
+
+        const scale = movingPlatform2.spriteScale;
+
+        const drawWidth  = movingPlatform2Sprite.width  * scale;
+        const drawHeight = movingPlatform2Sprite.height * scale;
+
+        const spriteYOffset = 39;// moves sprite down
+
+        const spriteX =
+            movingPlatform2.x - (drawWidth - movingPlatform2.width) / 2;
+
+        const spriteY =
+            movingPlatform2.y - (drawHeight - movingPlatform2.height) + spriteYOffset;
+
+        ctx.drawImage(
+            movingPlatform2Sprite,
+            spriteX,
+            spriteY,
+            drawWidth,
+            drawHeight
+        );
+
+        // debug hitbox
         ctx.strokeStyle = "cyan";
         ctx.strokeRect(
-        movingPlatform1.x,
-        movingPlatform1.y,
-        movingPlatform1.width,
-        movingPlatform1.height
-    );
+            movingPlatform2.x,
+            movingPlatform2.y,
+            movingPlatform2.width,
+            movingPlatform2.height
+        );
+    }
+
+    // draw moving platform 3 level 6
+    if (currentLevel === 5 && movingPlatform3 && movingPlatform3Sprite.complete) {
+
+        const scale = movingPlatform3.spriteScale;
+
+        const drawWidth  = movingPlatform3Sprite.width * scale;
+        const drawHeight = movingPlatform3Sprite.height * scale;
+
+        spriteYOffset = 47; // moves sprite down
+        
+        const spriteX =
+            movingPlatform3.x - (drawWidth - movingPlatform3.width) / 2;// center sprite on hitbox
+
+        const spriteY =
+            movingPlatform3.y - (drawHeight - movingPlatform3.height) + spriteYOffset;
+
+        ctx.drawImage(
+            movingPlatform3Sprite,
+            spriteX,
+            spriteY,
+            drawWidth,
+            drawHeight
+        );
+
+        // debug hitbox
+        ctx.strokeStyle = "cyan";
+        ctx.strokeRect(
+            movingPlatform3.x,
+            movingPlatform3.y,
+            movingPlatform3.width,
+            movingPlatform3.height
+        );
+    }
+
 
     // draw player sprite
     const sprite = sprites[player.direction];
