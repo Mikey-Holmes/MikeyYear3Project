@@ -210,8 +210,19 @@ let lavaSplashFrameIndex = 0;
 let lavaSplashFrameCounter = 0;
 let lavaSplashFrameDelay = 6;
 
+// dragon animation frames
+const dragonFrames = [];
 
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/dragonfly_" + i + ".png";
+    dragonFrames.push(img);
+}
 
+let dragon = null;
+let dragonFrameIndex = 0;
+let dragonFrameCounter = 0;
+let dragonFrameDelay = 15;
 
 
 
@@ -583,6 +594,26 @@ function loadLevel(levelIndex) {
     movingPlatform1.baseX +
     (spriteDrawWidth - movingPlatform1.width) / 2;
 
+    //dragon for level 6
+    if (levelIndex === 5) {
+
+        dragon = {
+            x: 1365,
+            y: 288,
+            startY: 288,
+            endY: 360,
+            speed: 2,
+            direction: "down"
+        };
+
+        dragonFrameIndex = 0;
+        dragonFrameCounter = 0;
+
+    } else {
+        dragon = null;
+    }
+
+
 }
 
 //load first level
@@ -944,6 +975,40 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             }
         }
     }
+
+    // level 6 dragon movement + animation
+    if (dragon && currentLevel === 5) {
+
+        // move dragon
+        if (dragon.direction === "down") {
+            dragon.y += dragon.speed * deltaTime;
+
+            if (dragon.y >= dragon.endY) {
+                dragon.direction = "up";
+            }
+        } 
+        else {
+            dragon.y -= dragon.speed * deltaTime;
+
+            if (dragon.y <= dragon.startY) {
+                dragon.y = dragon.startY;
+                dragon.direction = "down";
+            }
+        }
+
+        // animate dragon
+        dragonFrameCounter++;
+
+        if (dragonFrameCounter >= dragonFrameDelay) {
+            dragonFrameCounter = 0;
+            dragonFrameIndex++;
+        }
+
+        if (dragonFrameIndex >= dragonFrames.length) {
+            dragonFrameIndex = 0;
+        }
+    }
+
 
     // move platform 1 lvl 6
     if (currentLevel === 5 && movingPlatform1) {
@@ -1343,6 +1408,23 @@ function draw() {
             lavaSplash.size
         );
     }
+
+    // draw dragon for level 6
+    if (
+    dragon &&
+    dragonFrames[dragonFrameIndex] &&
+    dragonFrames[dragonFrameIndex].complete
+
+    ) {
+        ctx.drawImage(
+            dragonFrames[dragonFrameIndex],
+            dragon.x,
+            dragon.y,
+            160,
+            120
+        );
+    }
+
 
 
     // draw keys
