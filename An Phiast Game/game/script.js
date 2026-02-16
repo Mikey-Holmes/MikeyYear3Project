@@ -116,7 +116,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 6.0,
+    speed: 8.0,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -196,6 +196,20 @@ let movingPlatform3 = null;
 const movingPlatform4Sprite = new Image();
 movingPlatform4Sprite.src = "assets/images/movingrock4.png";
 let movingPlatform4 = null;
+
+// lava splash animation frames
+const lavaSplashFrames = [];
+for (let i = 1; i <= 7; i++) {
+    const img = new Image();
+    img.src = "assets/images/lavaSplash_" + i + ".png";
+    lavaSplashFrames.push(img);
+}
+
+let lavaSplash = null;
+let lavaSplashFrameIndex = 0;
+let lavaSplashFrameCounter = 0;
+let lavaSplashFrameDelay = 6;
+
 
 
 
@@ -676,7 +690,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
-    // animate lava background (level 4)
+    // animate lava background level 4 - 6
     if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         lavaFrameCounter++;
 
@@ -689,6 +703,23 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             }
         }
     }
+    
+    // animate lava splash if active
+    if (lavaSplash) {
+
+        lavaSplashFrameCounter++;
+
+        if (lavaSplashFrameCounter >= lavaSplashFrameDelay) {
+            lavaSplashFrameCounter = 0;
+            lavaSplashFrameIndex++;
+        }
+
+        if (lavaSplashFrameIndex >= lavaSplashFrames.length) {
+            lavaSplash = null;
+        }
+
+    }
+
 
 
     // collision with walls for level 4
@@ -1183,16 +1214,34 @@ if (!invincible && currentLevel === 2) {
         }
     }
 
-
-
-    // lava death level 4 AND 5
+    // lava death level 4 ,5 and 6
     if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
-        if (player.y + player.size >= 860) { // lava Y
-            player.x = 177;
-            player.y = 474;
-            velocityY = 0;
+
+    if (player.y + player.size >= 860) {
+
+        // create splash where player died
+        lavaSplash = {
+            x: player.x - 30,
+            y: 860 - 80,
+            size: 120
+        };
+
+        lavaSplashFrameIndex = 0;
+        lavaSplashFrameCounter = 0;
+
+        // respawn player immediately
+        player.x = 177;
+
+        if (currentLevel === 5) {
+            player.y = 520;
+        } else {
+            player.y = 540;
         }
+
+        velocityY = 0;
     }
+}
+
 }
 
 
@@ -1277,6 +1326,24 @@ function draw() {
             lavaWidth, lavaHeight 
         );
     }
+
+    // draw lava splash if player just died in lava
+    if (
+        lavaSplash &&
+        lavaSplashFrames[lavaSplashFrameIndex] &&
+        lavaSplashFrames[lavaSplashFrameIndex].complete
+    ) 
+    
+    {
+        ctx.drawImage(
+            lavaSplashFrames[lavaSplashFrameIndex],
+            lavaSplash.x,
+            lavaSplash.y,
+            lavaSplash.size,
+            lavaSplash.size
+        );
+    }
+
 
     // draw keys
     if (key.spawned && !key.collected) {
