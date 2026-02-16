@@ -224,6 +224,25 @@ let dragonFrameIndex = 0;
 let dragonFrameCounter = 0;
 let dragonFrameDelay = 15;
 
+// fireball animation frames
+const fireballFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/fireball_" + i + ".png";
+    fireballFrames.push(img);
+}
+
+let fireball = null;
+let fireballFrameIndex = 0;
+let fireballFrameCounter = 0;
+let fireballFrameDelay = 6;
+
+let fireballShootCounter = 0;
+let fireballShootDelay = 120; // 2 seconds
+
+
+
 
 
 // levels definition
@@ -400,10 +419,11 @@ const levels = [
     {
     backgroundSrc: "assets/images/caveThree.png",//background lvl 6
         walls: [
-            {x: 132, y: 400, width: 3, height: 194},
+            {x: 127, y: 322, width: 9, height: 634},
             {x: 144, y: 586, width: 146, height: 3},
             {x: 1617, y: 615, width: 158, height: 3},
-            {x: 1782, y: 392, width: 4, height: 215},
+            {x: 1781, y: 391, width: 6, height: 542},
+            {x: 155, y: 876, width: 1605, height: 6},
 
         ],
         key: {},
@@ -900,7 +920,28 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+    
+    // fireball hits player level 6
+    if (fireball && currentLevel === 5) {
 
+        const hitboxPadding = 40;// make hitbox smaller for better feel
+
+        const fireballHitbox = {
+            x: fireball.x + hitboxPadding,
+            y: fireball.y + hitboxPadding,
+            size: fireball.size - hitboxPadding * 2
+        };
+
+        if (isColliding(player, fireballHitbox)) {
+
+            fireball = null;
+
+            // respawn player
+            player.x = 177;
+            player.y = 520;
+            velocityY = 0;
+        }
+    }
 
 
     // player animation
@@ -1009,6 +1050,72 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+   // dragon fireball shooting level 6
+    if (dragon && currentLevel === 5) {
+
+        fireballShootCounter++;
+
+        if (fireballShootCounter >= fireballShootDelay && !fireball) {
+
+            let dx = player.x - dragon.x;
+            let dy = player.y - dragon.y;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > 0) {
+                dx = dx / dist;
+                dy = dy / dist;
+            }
+
+            fireball = {
+                x: dragon.x,
+                y: dragon.y + 40,
+                dx: dx,
+                dy: dy,
+                size: 60,
+                speed: 5
+            };
+
+            fireballFrameIndex = 0;
+            fireballFrameCounter = 0;
+            fireballShootCounter = 0;
+        }
+    }
+
+    // update fireball
+    if (fireball) {
+
+        fireball.x += fireball.dx * fireball.speed * deltaTime;
+        fireball.y += fireball.dy * fireball.speed * deltaTime;
+
+        // animate fireball
+        fireballFrameCounter++;
+
+        if (fireballFrameCounter >= fireballFrameDelay) {
+            fireballFrameCounter = 0;
+            fireballFrameIndex++;
+        }
+
+        if (fireballFrameIndex >= fireballFrames.length) {
+            fireballFrameIndex = 0;
+        }
+    }
+
+    // fireball hits walls
+    if (fireball) {
+
+        for (let wall of walls) {
+
+            if (
+                fireball.x < wall.x + (wall.width || wall.size) &&
+                fireball.x + fireball.size > wall.x &&
+                fireball.y < wall.y + (wall.height || wall.size) &&
+                fireball.y + fireball.size > wall.y
+            ) {
+                fireball = null;
+                break;
+            }
+        }
+    }
 
     // move platform 1 lvl 6
     if (currentLevel === 5 && movingPlatform1) {
@@ -1420,11 +1527,10 @@ function draw() {
             dragonFrames[dragonFrameIndex],
             dragon.x,
             dragon.y,
-            160,
-            120
+            180,
+            140
         );
     }
-
 
 
     // draw keys
@@ -1612,6 +1718,22 @@ if (currentDrag) {
             movingPlatform4.y,
             movingPlatform4.width,
             movingPlatform4.height
+        );
+    }
+
+    if (
+        fireball &&
+        fireballFrames[fireballFrameIndex] &&
+        fireballFrames[fireballFrameIndex].complete
+    ) 
+    
+        {
+            ctx.drawImage(
+                fireballFrames[fireballFrameIndex],
+                fireball.x,
+                fireball.y,
+                fireball.size,
+                fireball.size
         );
     }
 
