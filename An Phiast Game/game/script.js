@@ -258,6 +258,12 @@ let fallingRockFrameDelay = 12;
 let fallingRockRespawnCounter = 0;
 let fallingRockRespawnDelay = 60;
 
+let fallingRock2 = null;
+let fallingRock2FrameIndex = 0;
+let fallingRock2FrameCounter = 0;
+let fallingRock2RespawnCounter = 0;
+
+
 
 
 
@@ -652,7 +658,7 @@ function loadLevel(levelIndex) {
         dragon = null;
     }
 
-    // falling rock for level 5
+    // falling rocks for level 5
     if (levelIndex === 4) {
 
         fallingRock = {
@@ -662,15 +668,25 @@ function loadLevel(levelIndex) {
             speed: 8
         };
 
+        fallingRock2 = {
+            x: 1090,
+            y: 212,
+            size: 50,
+            speed: 9
+        };
+
         fallingRockFrameIndex = 0;
         fallingRockFrameCounter = 0;
         fallingRockRespawnCounter = 0;
 
+        fallingRock2FrameIndex = 0;
+        fallingRock2FrameCounter = 0;
+        fallingRock2RespawnCounter = 0;
+
     } else {
         fallingRock = null;
+        fallingRock2 = null;
     }
-
-
 
 }
 
@@ -1226,6 +1242,71 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     }
 
     }
+
+    // second falling rock level 5
+    if (currentLevel === 4) {
+
+        if (fallingRock2) {
+
+            fallingRock2.y += fallingRock2.speed * deltaTime;
+
+            fallingRock2FrameCounter++;
+
+            if (fallingRock2FrameCounter >= fallingRockFrameDelay) {
+                fallingRock2FrameCounter = 0;
+                fallingRock2FrameIndex++;
+            }
+
+            if (fallingRock2FrameIndex >= fallingRockFrames.length) {
+                fallingRock2FrameIndex = 0;
+            }
+
+            if (fallingRock2.y >= 850) {
+                fallingRock2 = null;
+                fallingRock2RespawnCounter = 0;
+            }
+        }
+        else {
+            fallingRock2RespawnCounter++;
+
+            if (fallingRock2RespawnCounter >= fallingRockRespawnDelay) {
+                fallingRock2 = {
+                    x: 1090,
+                    y: 212,
+                    size: 50,
+                    speed: 9
+                };
+
+                fallingRock2FrameIndex = 0;
+                fallingRock2FrameCounter = 0;
+                fallingRock2RespawnCounter = 0;
+            }
+        }
+
+        // second falling rock hits player
+        if (currentLevel === 4 && fallingRock2) {
+
+            const hitboxPadding = 20;
+
+            const rockHitbox = {
+                x: fallingRock2.x + hitboxPadding,
+                y: fallingRock2.y + hitboxPadding,
+                size: fallingRock2.size - hitboxPadding * 2
+            };
+
+            if (isColliding(player, rockHitbox)) {
+
+                fallingRock2 = null;
+                fallingRock2RespawnCounter = 0;
+
+                player.x = 177;
+                player.y = 540;
+                velocityY = 0;
+            }
+        }
+
+    }
+
 
 
     // move platform 1 lvl 6
@@ -1845,6 +1926,24 @@ if (currentDrag) {
             fallingRock.y,
             fallingRock.size,
             fallingRock.size
+        );
+    }
+
+    // draw falling rock 2 level 5
+    if (
+        currentLevel === 4 &&
+        fallingRock2 &&
+        fallingRockFrames[fallingRock2FrameIndex] &&
+        fallingRockFrames[fallingRock2FrameIndex].complete
+    ) 
+    
+    {
+        ctx.drawImage(
+            fallingRockFrames[fallingRock2FrameIndex],
+            fallingRock2.x,
+            fallingRock2.y,
+            fallingRock2.size,
+            fallingRock2.size
         );
     }
 
