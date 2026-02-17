@@ -273,6 +273,21 @@ let fallingRock4FrameIndex = 0;
 let fallingRock4FrameCounter = 0;
 let fallingRock4RespawnCounter = 0;
 
+// green boss animation frames
+const greenBossFrames = [];
+
+for (let i = 1; i <= 6; i++) {
+    const img = new Image();
+    img.src = "assets/images/greenboss_" + i + ".png";
+    greenBossFrames.push(img);
+}
+
+let greenBoss = null;
+let greenBossFrameIndex = 0;
+let greenBossFrameCounter = 0;
+let greenBossFrameDelay = 18;
+
+
 
 
 // levels definition
@@ -463,7 +478,7 @@ const levels = [
     {
     backgroundSrc: "assets/images/background_7.png",//background lvl 7
         walls: [
-            
+
             {x: 577, y: 468, width: 787, height: 6},
             {x: 1460, y: 474, width: 8, height: 287},
             {x: 578, y: 742, width: 786, height: 6},
@@ -747,6 +762,24 @@ function loadLevel(levelIndex) {
         fallingRock2 = null;
         fallingRock3 = null;
         fallingRock4 = null;
+    }
+
+    // green boss for level 7
+    if (levelIndex === 6) {
+
+        greenBoss = {
+            x: 828,
+            y: 605,
+            size: 140,
+            speed: 1.2,
+            direction: "right"
+        };
+
+        greenBossFrameIndex = 0;
+        greenBossFrameCounter = 0;
+
+    } else {
+        greenBoss = null;
     }
 
 }
@@ -1231,6 +1264,42 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             }
         }
     }
+
+    // green boss movement + animation level 7
+    if (greenBoss && currentLevel === 6) {
+
+        let dx = player.x - greenBoss.x;
+        let dy = player.y - greenBoss.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 0) {
+            dx /= dist;
+            dy /= dist;
+
+            greenBoss.x += dx * greenBoss.speed * deltaTime;
+            greenBoss.y += dy * greenBoss.speed * deltaTime;
+
+            // set facing direction
+            if (dx < 0) {
+                greenBoss.direction = "left";
+            } else {
+                greenBoss.direction = "right";
+            }
+        }
+
+        // animate boss
+        greenBossFrameCounter++;
+
+        if (greenBossFrameCounter >= greenBossFrameDelay) {
+            greenBossFrameCounter = 0;
+            greenBossFrameIndex++;
+        }
+
+        if (greenBossFrameIndex >= greenBossFrames.length) {
+            greenBossFrameIndex = 0;
+        }
+    }
+
 
     // falling rock level 5
     if (currentLevel === 4) {
@@ -2186,6 +2255,39 @@ if (currentDrag) {
                 fireball.size
         );
     }
+
+    // draw green boss level 7
+    if (
+        greenBoss &&
+        greenBossFrames[greenBossFrameIndex] &&
+        greenBossFrames[greenBossFrameIndex].complete
+    ) {
+        ctx.save();
+
+        if (greenBoss.direction === "left") {
+            ctx.translate(greenBoss.x + greenBoss.size, greenBoss.y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(
+                greenBossFrames[greenBossFrameIndex],
+                0,
+                0,
+                greenBoss.size,
+                greenBoss.size
+            );
+        } else {
+            ctx.drawImage(
+                greenBossFrames[greenBossFrameIndex],
+                greenBoss.x,
+                greenBoss.y,
+                greenBoss.size,
+                greenBoss.size
+            );
+        }
+
+        ctx.restore();
+    }
+
 
 
 
