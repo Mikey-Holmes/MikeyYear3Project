@@ -116,7 +116,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 8.0,
+    speed: 10.0,
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -272,13 +272,6 @@ let fallingRock4 = null;
 let fallingRock4FrameIndex = 0;
 let fallingRock4FrameCounter = 0;
 let fallingRock4RespawnCounter = 0;
-
-
-
-
-
-
-
 
 
 
@@ -465,6 +458,32 @@ const levels = [
         ],
         key: {},
         exitWall: {x: 1782, y: 392, width: 4, height: 215}
+    },
+
+    {
+    backgroundSrc: "assets/images/background_7.png",//background lvl 7
+        walls: [
+            
+            {x: 577, y: 468, width: 787, height: 6},
+            {x: 1460, y: 474, width: 8, height: 287},
+            {x: 578, y: 742, width: 786, height: 6},
+            {x: 438, y: 469, width: 118, height: 39},
+            {x: 456, y: 507, width: 8, height: 234},
+            {x: 1388, y: 474, width: 103, height: 33},
+
+            //bottom left of circle barriers
+            {x: 450, y: 721, width: 126, height: 22},
+            {x: 462, y: 705, width: 70, height: 13},
+            {x: 464, y: 686, width: 20, height: 16},
+
+            //bottom right of circle barriers
+            {x: 1333, y: 723, width: 126, height: 16},
+            {x: 1383, y: 709, width: 75, height: 14},
+            {x: 1428, y: 689, width: 36, height: 16},
+
+        ],
+        key: {},
+        exitWall: {}
     }
 ];
 
@@ -520,6 +539,11 @@ function loadLevel(levelIndex) {
     else if (levelIndex === 5) {
     player.x = 177;
     player.y = 520;
+    }
+    else if (levelIndex === 6) {
+    // level 7
+    player.x = 928;
+    player.y = 605;
     }
     else {
     //first three levels so far
@@ -770,7 +794,7 @@ function update(deltaTime) {
     let nextX = player.x;
     let nextY = player.y;
 
-    // movement for level 4
+    // movement for levels 4 - 6
 if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // left or right only
     if (pressedKeys["a"]) {
