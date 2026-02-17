@@ -268,6 +268,12 @@ let fallingRock3FrameIndex = 0;
 let fallingRock3FrameCounter = 0;
 let fallingRock3RespawnCounter = 0;
 
+let fallingRock4 = null;
+let fallingRock4FrameIndex = 0;
+let fallingRock4FrameCounter = 0;
+let fallingRock4RespawnCounter = 0;
+
+
 
 
 
@@ -688,6 +694,13 @@ function loadLevel(levelIndex) {
             speed: 7
         };
 
+        fallingRock4 = {
+            x: 1495,
+            y: 212,
+            size: 50,
+            speed: 7
+        };
+
 
         fallingRockFrameIndex = 0;
         fallingRockFrameCounter = 0;
@@ -701,11 +714,15 @@ function loadLevel(levelIndex) {
         fallingRock3FrameCounter = 0;
         fallingRock3RespawnCounter = 0;
 
+        fallingRock4FrameIndex = 0;
+        fallingRock4FrameCounter = 0;
+        fallingRock4RespawnCounter = 0;
 
     } else {
         fallingRock = null;
         fallingRock2 = null;
         fallingRock3 = null;
+        fallingRock4 = null;
     }
 
 }
@@ -1390,6 +1407,70 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+    // fourth falling rock level 5
+    if (currentLevel === 4) {
+
+        if (fallingRock4) {
+
+            fallingRock4.y += fallingRock4.speed * deltaTime;
+
+            fallingRock4FrameCounter++;
+
+            if (fallingRock4FrameCounter >= fallingRockFrameDelay) {
+                fallingRock4FrameCounter = 0;
+                fallingRock4FrameIndex++;
+            }
+
+            if (fallingRock4FrameIndex >= fallingRockFrames.length) {
+                fallingRock4FrameIndex = 0;
+            }
+
+            if (fallingRock4.y >= 850) {
+                fallingRock4 = null;
+                fallingRock4RespawnCounter = 0;
+            }
+        }
+        else {
+            fallingRock4RespawnCounter++;
+
+            if (fallingRock4RespawnCounter >= fallingRockRespawnDelay) {
+                fallingRock4 = {
+                    x: 1495,
+                    y: 212,
+                    size: 50,
+                    speed: 7
+                };
+
+                fallingRock4FrameIndex = 0;
+                fallingRock4FrameCounter = 0;
+                fallingRock4RespawnCounter = 0;
+            }
+        }
+
+        // rock 4 hits player
+        if (fallingRock4) {
+
+            const hitboxPadding = 20;
+
+            const rockHitbox = {
+                x: fallingRock4.x + hitboxPadding,
+                y: fallingRock4.y + hitboxPadding,
+                size: fallingRock4.size - hitboxPadding * 2
+            };
+
+            if (isColliding(player, rockHitbox)) {
+
+                fallingRock4 = null;
+                fallingRock4RespawnCounter = 0;
+
+                player.x = 177;
+                player.y = 540;
+                velocityY = 0;
+            }
+        }
+    }
+
+
 
 
 
@@ -2046,6 +2127,23 @@ if (currentDrag) {
             fallingRock3.size
         );
     }
+
+    // draw falling rock 4 level 5
+    if (
+        currentLevel === 4 &&
+        fallingRock4 &&
+        fallingRockFrames[fallingRock4FrameIndex] &&
+        fallingRockFrames[fallingRock4FrameIndex].complete
+    ) {
+        ctx.drawImage(
+            fallingRockFrames[fallingRock4FrameIndex],
+            fallingRock4.x,
+            fallingRock4.y,
+            fallingRock4.size,
+            fallingRock4.size
+        );
+    }
+
 
 
 
