@@ -239,7 +239,26 @@ let fireballFrameCounter = 0;
 let fireballFrameDelay = 6;
 
 let fireballShootCounter = 0;
-let fireballShootDelay = 120; // 2 seconds
+let fireballShootDelay = 60; // 1 second
+
+// falling rock animation frames
+const fallingRockFrames = [];
+
+for (let i = 1; i <= 6; i++) {
+    const img = new Image();
+    img.src = "assets/images/fallingrock_" + i + ".png";
+    fallingRockFrames.push(img);
+}
+
+let fallingRock = null;
+let fallingRockFrameIndex = 0;
+let fallingRockFrameCounter = 0;
+let fallingRockFrameDelay = 12;
+
+let fallingRockRespawnCounter = 0;
+let fallingRockRespawnDelay = 60;
+
+
 
 
 
@@ -618,7 +637,7 @@ function loadLevel(levelIndex) {
     if (levelIndex === 5) {
 
         dragon = {
-            x: 1365,
+            x: 1360,
             y: 288,
             startY: 288,
             endY: 360,
@@ -632,6 +651,25 @@ function loadLevel(levelIndex) {
     } else {
         dragon = null;
     }
+
+    // falling rock for level 5
+    if (levelIndex === 4) {
+
+        fallingRock = {
+            x: 742,
+            y: 212,
+            size: 50,
+            speed: 8
+        };
+
+        fallingRockFrameIndex = 0;
+        fallingRockFrameCounter = 0;
+        fallingRockRespawnCounter = 0;
+
+    } else {
+        fallingRock = null;
+    }
+
 
 
 }
@@ -924,7 +962,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // fireball hits player level 6
     if (fireball && currentLevel === 5) {
 
-        const hitboxPadding = 40;// make hitbox smaller for better feel
+        const hitboxPadding = 33;// make hitbox smaller for better feel
 
         const fireballHitbox = {
             x: fireball.x + hitboxPadding,
@@ -1072,7 +1110,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                 dx: dx,
                 dy: dy,
                 size: 60,
-                speed: 5
+                speed: 8
             };
 
             fireballFrameIndex = 0;
@@ -1116,6 +1154,79 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             }
         }
     }
+
+    // falling rock level 5
+    if (currentLevel === 4) {
+
+        // if rock exists make it fall
+        if (fallingRock) {
+
+            fallingRock.y += fallingRock.speed * deltaTime;
+
+            // animate rock
+            fallingRockFrameCounter++;
+
+            if (fallingRockFrameCounter >= fallingRockFrameDelay) {
+                fallingRockFrameCounter = 0;
+                fallingRockFrameIndex++;
+            }
+
+            if (fallingRockFrameIndex >= fallingRockFrames.length) {
+                fallingRockFrameIndex = 0;
+            }
+
+            // hit lava , remove rock
+            if (fallingRock.y >= 850) {
+                fallingRock = null;
+                fallingRockRespawnCounter = 0;
+            }
+        }
+
+        // respawn after delay
+        else {
+            fallingRockRespawnCounter++;
+
+            if (fallingRockRespawnCounter >= fallingRockRespawnDelay) {
+
+                fallingRock = {
+                    x: 742,
+                    y: 212,
+                    size: 50,
+                    speed: 6
+                };
+
+                fallingRockFrameIndex = 0;
+                fallingRockFrameCounter = 0;
+                fallingRockRespawnCounter = 0;
+            }
+        }
+
+        // falling rock hits player 
+    if (currentLevel === 4 && fallingRock) {
+
+        const hitboxPadding = 20; // hitbox smaller
+
+        const rockHitbox = {
+            x: fallingRock.x + hitboxPadding,
+            y: fallingRock.y + hitboxPadding,
+            size: fallingRock.size - hitboxPadding * 2
+        };
+
+        if (isColliding(player, rockHitbox)) {
+
+            // remove rock
+            fallingRock = null;
+            fallingRockRespawnCounter = 0;
+
+            // respawn player 
+            player.x = 177;
+            player.y = 540;
+            velocityY = 0;
+        }
+    }
+
+    }
+
 
     // move platform 1 lvl 6
     if (currentLevel === 5 && movingPlatform1) {
@@ -1527,8 +1638,8 @@ function draw() {
             dragonFrames[dragonFrameIndex],
             dragon.x,
             dragon.y,
-            180,
-            140
+            220,
+            180
         );
     }
 
@@ -1720,6 +1831,23 @@ if (currentDrag) {
             movingPlatform4.height
         );
     }
+
+    // draw falling rock level 5
+    if (
+        currentLevel === 4 &&
+        fallingRock &&
+        fallingRockFrames[fallingRockFrameIndex] &&
+        fallingRockFrames[fallingRockFrameIndex].complete
+    ) {
+        ctx.drawImage(
+            fallingRockFrames[fallingRockFrameIndex],
+            fallingRock.x,
+            fallingRock.y,
+            fallingRock.size,
+            fallingRock.size
+        );
+    }
+
 
     if (
         fireball &&
