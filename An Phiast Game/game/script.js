@@ -134,6 +134,19 @@ let isOnGround = false;
 // keys pressed
 let pressedKeys = {};
 
+// sparkle key animation
+const sparkleFrames = [];
+
+for (let i = 1; i <= 6; i++) {
+    const img = new Image();
+    img.src = "assets/images/sparkle_" + i + ".png";
+    sparkleFrames.push(img);
+}
+
+let sparkleFrameIndex = 0;
+let sparkleFrameCounter = 0;
+let sparkleFrameDelay = 15;
+
 // game state
 let gameState = "menu";
 
@@ -239,7 +252,7 @@ let fireballFrameCounter = 0;
 let fireballFrameDelay = 6;
 
 let fireballShootCounter = 0;
-let fireballShootDelay = 60; // 1 second
+let fireballShootDelay = 110;
 
 // falling rock animation frames
 const fallingRockFrames = [];
@@ -901,6 +914,22 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                 lavaFrameIndex = 0;
             }
         }
+    }
+
+    // animate sparkle while key exists
+    if (key.spawned && !key.collected) {
+
+        sparkleFrameCounter++;
+
+        if (sparkleFrameCounter >= sparkleFrameDelay) {
+            sparkleFrameCounter = 0;
+            sparkleFrameIndex++;
+
+            if (sparkleFrameIndex >= sparkleFrames.length) {
+                sparkleFrameIndex = 0;
+            }
+        }
+
     }
     
     // animate lava splash if active
@@ -1992,6 +2021,23 @@ function draw() {
         } else if (currentLevel === 2) {
             ctx.drawImage(key3Sprite, key.x, key.y, key.size, key.size);
         }
+    }
+
+    // draw sparkle near key
+    if (
+        key.spawned &&
+        !key.collected &&
+        sparkleFrames[sparkleFrameIndex] &&
+        sparkleFrames[sparkleFrameIndex].complete
+    ) {
+
+        ctx.drawImage(
+            sparkleFrames[sparkleFrameIndex],
+            key.x - 20,
+            key.y - 35,
+            key.size * 3,
+            key.size * 3
+        );
     }
 
     if (debugMode) {
