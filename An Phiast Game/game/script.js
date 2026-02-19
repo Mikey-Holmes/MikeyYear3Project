@@ -1139,12 +1139,12 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     if (player.y > canvas.height - player.size) player.y = canvas.height - player.size;
 
     // key collection
-    if (!key.collected && isColliding(player, key)) {
+    if (key.spawned && !key.collected && isColliding(player, key)) {
         key.collected = true;
         console.log("Key collected!");
 
         keyPickupSound.currentTime = 0;
-        keyPickupSound.play(); //play key sound
+        keyPickupSound.play();
     }
 
     // pick up bow and spawn enemies in level 3
@@ -1791,12 +1791,14 @@ if (!invincible && currentLevel === 2) {
         enemy2 = null;
         enemy3 = null;
 
-        // place key and mark it as spawned
-        key.x = 1500;
-        key.y = 450;
-        key.size = 30;
-        key.collected = false;
-        key.spawned = true;
+        // spawn key fixed
+        key = {
+            x: 1500,
+            y: 450,
+            size: 30,
+            collected: false,
+            spawned: true
+        };
 
         console.log("Key has spawned!");
     }
