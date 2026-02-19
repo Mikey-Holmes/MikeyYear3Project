@@ -300,6 +300,21 @@ let greenBossFrameIndex = 0;
 let greenBossFrameCounter = 0;
 let greenBossFrameDelay = 18;
 
+let level7Fires = [];
+
+// level 7 fire frames
+const fireLevel7Frames = [];
+
+for (let i = 1; i <= 9; i++) {
+    const img = new Image();
+    img.src = "assets/images/flamesBoss7_" + i + ".png";
+    fireLevel7Frames.push(img);
+}
+
+let fireLevel7FrameIndex = 0;
+let fireLevel7FrameCounter = 0;
+let fireLevel7FrameDelay = 13;
+
 
 
 
@@ -777,7 +792,7 @@ function loadLevel(levelIndex) {
         fallingRock4 = null;
     }
 
-    // green boss for level 7
+    // green boss + fire for level 7
     if (levelIndex === 6) {
 
         greenBoss = {
@@ -791,8 +806,20 @@ function loadLevel(levelIndex) {
         greenBossFrameIndex = 0;
         greenBossFrameCounter = 0;
 
+        // spawn level 7 fires
+        level7Fires = [
+            { x: 370, y: 400, size: 110 },
+            { x: 215, y: 470, size: 140 },
+            { x: 1475, y: 440, size: 90 },
+            { x: 1580, y: 470, size: 140 }
+        ];
+
+        fireLevel7FrameIndex = 0;
+        fireLevel7FrameCounter = 0;
+
     } else {
         greenBoss = null;
+        level7Fires = [];
     }
 
 }
@@ -1327,6 +1354,22 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         if (greenBossFrameIndex >= greenBossFrames.length) {
             greenBossFrameIndex = 0;
         }
+    }
+
+    // animate level 7 fires
+    if (currentLevel === 6 && level7Fires.length > 0) {
+
+        fireLevel7FrameCounter++;
+
+        if (fireLevel7FrameCounter >= fireLevel7FrameDelay) {
+            fireLevel7FrameCounter = 0;
+            fireLevel7FrameIndex++;
+
+            if (fireLevel7FrameIndex >= fireLevel7Frames.length) {
+                fireLevel7FrameIndex = 0;
+            }
+        }
+
     }
 
 
@@ -2334,6 +2377,28 @@ if (currentDrag) {
         }
 
         ctx.restore();
+    }
+
+    // draw level 7 fires
+    if (currentLevel === 6) {
+
+        for (let fire of level7Fires) {
+
+            if (
+                fireLevel7Frames[fireLevel7FrameIndex] &&
+                fireLevel7Frames[fireLevel7FrameIndex].complete
+            ) {
+
+                ctx.drawImage(
+                    fireLevel7Frames[fireLevel7FrameIndex],
+                    fire.x,
+                    fire.y,
+                    fire.size,
+                    fire.size
+                );
+            }
+        }
+
     }
 
 
