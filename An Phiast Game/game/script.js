@@ -157,7 +157,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 10.0, // 6 is default, adjusted for testing
+    speed: 6.0, // 6 is default, adjusted for testing
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -199,7 +199,7 @@ let bossScore = 0; // level 7 score
 let health = 3; // player health
 let invincible = false;
 
-let showEnding = false; //end screen
+let showEnding = true; //end screen
 
 // animated lava for level 4
 const lavaFrames = [];
@@ -818,6 +818,11 @@ function loadLevel(levelIndex) {
 
         dragonFrameIndex = 0;
         dragonFrameCounter = 0;
+
+        fireball = null;
+        fireballShootCounter = 0;
+        fireballFrameIndex = 0;
+        fireballFrameCounter = 0;
 
     } else {
         dragon = null;
@@ -1606,7 +1611,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         bossArrow = null;
 
         // boss defeated
-        if (bossScore >= 100) {
+        if (bossScore >= 150) {
 
             greenBoss = null;
             bossState = "walk";
@@ -2264,7 +2269,7 @@ if (!invincible && currentLevel === 2) {
             (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) ||
 
             // level 7 needs boss score
-            (currentLevel === 6 && bossScore >= 100)
+            (currentLevel === 6 && bossScore >= 150)
         )
     ) 
     {
@@ -2351,7 +2356,7 @@ if (!invincible && currentLevel === 2) {
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
 let currentDrag = null; 
-let debugMode = true;
+let debugMode = false;
 
 canvas.addEventListener("mousedown", (e) => {
     if (gameState !== "playing") return;
@@ -2522,7 +2527,7 @@ function draw() {
 
 
 // show live dragging wall
-if (currentDrag) {
+if (debugMode && currentDrag) {
     ctx.save();
     ctx.fillStyle = "rgba(0, 255, 0, 0.5)";
     ctx.fillRect(currentDrag.x, currentDrag.y, currentDrag.width, currentDrag.height);
@@ -2573,12 +2578,14 @@ if (currentDrag) {
         );
 
         // debug hitbox
-        ctx.strokeRect(
-            movingPlatform1.x,
-            movingPlatform1.y,
-            movingPlatform1.width,
-            movingPlatform1.height
-        );
+        if (debugMode) {
+            ctx.strokeRect(
+                movingPlatform1.x,
+                movingPlatform1.y,
+                movingPlatform1.width,
+                movingPlatform1.height
+            );
+    }
 
     }
 
@@ -2606,14 +2613,14 @@ if (currentDrag) {
             drawHeight
         );
 
-        // debug hitbox
-        ctx.strokeStyle = "cyan";
-        ctx.strokeRect(
-            movingPlatform2.x,
-            movingPlatform2.y,
-            movingPlatform2.width,
-            movingPlatform2.height
-        );
+        if (debugMode) {
+            ctx.strokeRect(
+                movingPlatform1.x,
+                movingPlatform1.y,
+                movingPlatform1.width,
+                movingPlatform1.height
+            );
+        }
     }
 
     // draw moving platform 3 level 6
@@ -2641,13 +2648,14 @@ if (currentDrag) {
         );
 
         // debug hitbox
-        ctx.strokeStyle = "cyan";
-        ctx.strokeRect(
-            movingPlatform3.x,
-            movingPlatform3.y,
-            movingPlatform3.width,
-            movingPlatform3.height
-        );
+       if (debugMode) {
+            ctx.strokeRect(
+                movingPlatform1.x,
+                movingPlatform1.y,
+                movingPlatform1.width,
+                movingPlatform1.height
+            );
+        }
     }
 
     // draw moving platform 4 level 6
@@ -2675,12 +2683,14 @@ if (currentDrag) {
 
         // debug hitbox
         ctx.strokeStyle = "cyan";
-        ctx.strokeRect(
-            movingPlatform4.x,
-            movingPlatform4.y,
-            movingPlatform4.width,
-            movingPlatform4.height
-        );
+        if (debugMode) {
+            ctx.strokeRect(
+                movingPlatform1.x,
+                movingPlatform1.y,
+                movingPlatform1.width,
+                movingPlatform1.height
+            );
+        }
     }
 
     // draw falling rock level 5
@@ -3036,7 +3046,7 @@ if (currentDrag) {
         ctx.fillStyle = "white";
         ctx.font = "24px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("Boss Score: " + bossScore + "/100", canvas.width / 2, 90);
+        ctx.fillText("Boss Score: " + bossScore + "/150", canvas.width / 2, 90);
         ctx.textAlign = "left";
 
         // heart sprites
