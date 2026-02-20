@@ -578,17 +578,20 @@ const hint = document.getElementById("hint");
 // update hint text based on level
 function updateHintText() {
     if (currentLevel === 0) {
-        hintBox.textContent = "Find something lying around and follow the path";
+        hintBox.textContent = "Find something lying around and follow the path!";
     } else if (currentLevel === 1) {
         hintBox.textContent = "It's dark... find the key and exit quickly!";
     } else if (currentLevel === 2) {
-        hintBox.textContent = "Defeat enemies to raise your score and reveal the key.";
+        hintBox.textContent = "Defeat enemies to raise your score and reveal the key!";
     } else if (currentLevel === 3) {
-        hintBox.textContent = "Jump Jump Jump!!!";
-    } else {
-        hintBox.textContent = "";
+        hintBox.textContent = "Lava ahead! Be careful, beware of the bat.. !";
+    } else if (currentLevel === 4) {
+        hintBox.textContent = "Watch out for falling rocks and time your jumps!";
+    } else if (currentLevel === 5) {
+        hintBox.textContent = "Ah moving platforms! Time your jumps carefully and watch out for the dragon attacks!";
+    } else if (currentLevel === 6) {
+        hintBox.textContent = "Final level! Defeat the boss and escape the cave!";
     }
-    
 }
 
 
