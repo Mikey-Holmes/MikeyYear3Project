@@ -590,7 +590,7 @@ function updateHintText() {
     } else if (currentLevel === 5) {
         hintBox.textContent = "Ah moving platforms! Time your jumps carefully and watch out for the dragon attacks!";
     } else if (currentLevel === 6) {
-        hintBox.textContent = "Final level! Defeat the boss and escape the cave!";
+        hintBox.textContent = "Final level! Beware of the green boss and his attacks, keep your distance and defeat him to escape the cave!";
     }
 }
 

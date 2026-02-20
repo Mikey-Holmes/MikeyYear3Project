@@ -75,6 +75,16 @@ canvas {
     background-image: url("assets/images/controlbutton.png");
 }
 
+#backButton {
+    background-image: url("assets/images/backbutton.png");
+    margin-top: 30px;
+}
+
+#controlsSprite {
+    width: 600px;
+    display: block;
+}
+
 .menuButton:hover {
     transform: scale(1.05);
 }
