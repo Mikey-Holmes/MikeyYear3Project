@@ -1677,6 +1677,10 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             trophy.spawned = false;
 
+            // play level up sound
+            levelCompleteSound.currentTime = 0;
+            levelCompleteSound.play();
+
             if (showEnding) {
                 endGameSplashes();
             }
