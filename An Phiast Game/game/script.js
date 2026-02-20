@@ -1250,6 +1250,10 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
         if (isColliding(player, fireballHitbox)) {
 
+            // play hit sound
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
             fireball = null;
 
             // respawn player
@@ -1750,6 +1754,10 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
         if (isColliding(player, rockHitbox)) {
 
+            // play hit sound
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
             // remove rock
             fallingRock = null;
             fallingRockRespawnCounter = 0;
@@ -1816,6 +1824,10 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (isColliding(player, rockHitbox)) {
 
+                // play hit sound
+                playerHitSound.currentTime = 0;
+                playerHitSound.play();
+
                 fallingRock2 = null;
                 fallingRock2RespawnCounter = 0;
 
@@ -1880,6 +1892,10 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (isColliding(player, rockHitbox)) {
 
+                // play hit sound
+                playerHitSound.currentTime = 0;
+                playerHitSound.play();
+
                 fallingRock3 = null;
                 fallingRock3RespawnCounter = 0;
 
@@ -1942,6 +1958,10 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             };
 
             if (isColliding(player, rockHitbox)) {
+
+                // play hit sound
+                playerHitSound.currentTime = 0;
+                playerHitSound.play();
 
                 fallingRock4 = null;
                 fallingRock4RespawnCounter = 0;
@@ -2282,6 +2302,11 @@ if (!invincible && currentLevel === 2) {
         };
 
         if (isColliding(playerHitbox, batHitbox)) {
+
+            //play hit sound
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
             player.x = 177;
             player.y = 540;
             velocityY = 0;
@@ -2292,6 +2317,10 @@ if (!invincible && currentLevel === 2) {
     if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
     if (player.y + player.size >= 860) {
+
+        //play hit sound
+        playerHitSound.currentTime = 0;
+        playerHitSound.play();
 
         // create splash where player died
         lavaSplash = {
