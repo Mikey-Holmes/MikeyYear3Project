@@ -116,7 +116,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 10.0,
+    speed: 10.0, // 6 is default, adjusted for testing
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -1377,7 +1377,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
 
         // start slam if close
-        if (bossState === "walk" && dist < 120 && bossSlamCooldown <= 0) {
+        if (bossState === "walk" && dist < 200 && bossSlamCooldown <= 0) {
             bossState = "slam";
             greenBossSlamFrameIndex = 0;
             greenBossSlamFrameCounter = 0;
@@ -1386,19 +1386,49 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         // slam state
         if (bossState === "slam") {
 
-            // stop moving and SLAM!!!
             greenBossSlamFrameCounter += 1 * deltaTime;
 
             if (greenBossSlamFrameCounter >= 6) {
                 greenBossSlamFrameCounter = 0;
                 greenBossSlamFrameIndex++;
+
+                // hit only on frame 6
+                if (greenBossSlamFrameIndex === 5 && !bossSlamTriggered) {
+
+                    bossSlamTriggered = true;
+
+                    let playerCenterX = player.x + player.size / 2;
+                    let playerCenterY = player.y + player.size / 2;
+
+                    let bossCenterX = greenBoss.x + greenBoss.size / 2;
+                    let bossCenterY = greenBoss.y + greenBoss.size / 2;
+
+                    let dx = playerCenterX - bossCenterX;
+                    let dy = playerCenterY - bossCenterY;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    // if player within slam radius
+                    if (dist < 300 && !invincible) {
+
+                        health -= 1;
+
+                        playerHitSound.currentTime = 0;
+                        playerHitSound.play();
+
+                        invincible = true;
+                        setTimeout(() => invincible = false, 1000);
+
+                        console.log("Boss slam hit! Health:", health);
+                    }
+                }
             }
 
             // when all frames played go back to walking
             if (greenBossSlamFrameIndex >= greenBossSlamFrames.length) {
                 bossState = "walk";
-                bossSlamCooldown = 180;
+                bossSlamCooldown = 30;
                 greenBossSlamFrameIndex = 0;
+                bossSlamTriggered = false;
             }
         }
 
@@ -1407,6 +1437,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             let bossStopDistance = 90;
 
+            // stop movement when close
             if (dist > bossStopDistance) {
 
                 dx /= dist;
@@ -1422,17 +1453,17 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                         greenBoss.direction = "right";
                     }
                 }
+            }
 
-                // walk animation
-                greenBossFrameCounter++;
+            // play walk animation
+            greenBossFrameCounter++;
 
-                if (greenBossFrameCounter >= greenBossFrameDelay) {
-                    greenBossFrameCounter = 0;
-                    greenBossFrameIndex++;
+            if (greenBossFrameCounter >= greenBossFrameDelay) {
+                greenBossFrameCounter = 0;
+                greenBossFrameIndex++;
 
-                    if (greenBossFrameIndex >= greenBossFrames.length) {
-                        greenBossFrameIndex = 0;
-                    }
+                if (greenBossFrameIndex >= greenBossFrames.length) {
+                    greenBossFrameIndex = 0;
                 }
             }
         }
@@ -2678,7 +2709,6 @@ if (enemy3) {
 
         ctx.restore();
     }
-
 
 
     // level 3 UI
