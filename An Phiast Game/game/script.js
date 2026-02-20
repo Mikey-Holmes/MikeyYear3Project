@@ -57,6 +57,47 @@ let enemy1 = null;
 let enemy2 = null;
 let enemy3 = null;
 
+// spawn area for level 3 right side
+const level3SpawnArea = {
+    x: 1176,
+    y: 352,
+    width: 137,
+    height: 344
+};
+
+// spawn area for level 3 left side
+const level3SpawnAreaLeft = {
+    x: 471,
+    y: 363,
+    width: 186,
+    height: 382
+};
+
+// get random spawn position within the area
+function getRandomSpawn(area, size) {
+    return {
+        x: Math.random() * (area.width - size) + area.x,
+        y: Math.random() * (area.height - size) + area.y
+    };
+}
+
+// get random spawn position either on the left or right side of level 3
+function getRandomSpawnEitherSide(size) {
+
+    let chosenArea;
+
+    if (Math.random() < 0.5) {
+        chosenArea = level3SpawnArea;// right side
+    } else {
+        chosenArea = level3SpawnAreaLeft;// left side
+    }
+
+    return {
+        x: Math.random() * (chosenArea.width - size) + chosenArea.x,
+        y: Math.random() * (chosenArea.height - size) + chosenArea.y
+    };
+}
+
 // enemy sprites
 const enemy1Sprite = new Image();
 enemy1Sprite.src = "assets/images/bluespider.png";
@@ -580,7 +621,7 @@ function updateHintText() {
     if (currentLevel === 0) {
         hintBox.textContent = "Find something lying around and follow the path!";
     } else if (currentLevel === 1) {
-        hintBox.textContent = "It's dark... find the key and exit quickly!";
+        hintBox.textContent = "It's dark... find the key and the exit to escape!";
     } else if (currentLevel === 2) {
         hintBox.textContent = "Defeat enemies to raise your score and reveal the key!";
     } else if (currentLevel === 3) {
@@ -1250,9 +1291,14 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         bow.collected = true;
 
         if (currentLevel === 2) {
-            enemy1 = { x: 1518, y: 398, startX: 1518, startY: 398, size: 70, speed: 0.2, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
-            enemy2 = { x: 1518, y: 506, startX: 1518, startY: 506, size: 70, speed: 0.5, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
-            enemy3 = { x: 1518, y: 597, startX: 1518, startY: 597, size: 55, speed: 1, frameX: 0, maxFrame: 4, frameCounter: 0, frameDelay: 10 };
+
+            let s1 = getRandomSpawnEitherSide(70);
+            let s2 = getRandomSpawnEitherSide(70);
+            let s3 = getRandomSpawnEitherSide(55);
+
+            enemy1 = { x: s1.x, y: s1.y, size: 100, speed: 0.9, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
+            enemy2 = { x: s2.x, y: s2.y, size: 100, speed: 1.2, frameX: 0, maxFrame: 7, frameCounter: 0, frameDelay: 10 };
+            enemy3 = { x: s3.x, y: s3.y, size: 85, speed: 1.6, frameX: 0, maxFrame: 4, frameCounter: 0, frameDelay: 10 };
         }
     }
 
@@ -2045,8 +2091,11 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                 enemyHitSound.currentTime = 0;//enemy hit sound
                 enemyHitSound.play();
 
-                e.x = e.startX;
-                e.y = e.startY;
+                if (currentLevel === 2) {
+                    let s = getRandomSpawnEitherSide(e.size);
+                    e.x = s.x;
+                    e.y = s.y;
+                }
                 arrow = null;
 
                 if (currentLevel === 2) score += 5;
@@ -2063,10 +2112,18 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
     // enemy movement towards player
     function moveEnemy(enemy) {
-        let dx = player.x - enemy.x;
-        let dy = player.y - enemy.y;
-        let dist = Math.sqrt(dx * dx + dy * dy);
+    let dx = player.x - enemy.x;
+    let dy = player.y - enemy.y;
+    let dist = Math.sqrt(dx * dx + dy * dy);
+
         if (dist > 0) {
+
+            if (dx > 0) {
+                enemy.direction = "right";
+            } else {
+                enemy.direction = "left";
+            }
+
             enemy.x += (dx / dist) * enemy.speed * deltaTime; 
             enemy.y += (dy / dist) * enemy.speed * deltaTime; 
         }
@@ -2778,35 +2835,80 @@ if (currentDrag) {
         player.x, player.y, player.size, player.size
     );
     // draw enemy 1
-   if (enemy1) {
-    const frameWidth1 = enemy1Sprite.width / (enemy1.maxFrame + 1);
-    const frameHeight1 = enemy1Sprite.height;
-    ctx.drawImage(
-        enemy1Sprite,
-        enemy1.frameX * frameWidth1, 0, frameWidth1, frameHeight1,
-        enemy1.x, enemy1.y, enemy1.size, enemy1.size
-    );
-}
+    if (enemy1) {
+        const frameWidth1 = enemy1Sprite.width / (enemy1.maxFrame + 1);
+        const frameHeight1 = enemy1Sprite.height;
+
+        ctx.save();
+
+        if (enemy1.direction === "right") {
+            ctx.translate(enemy1.x + enemy1.size, enemy1.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+                enemy1Sprite,
+                enemy1.frameX * frameWidth1, 0, frameWidth1, frameHeight1,
+                0, 0, enemy1.size, enemy1.size
+            );
+        } else {
+            ctx.drawImage(
+                enemy1Sprite,
+                enemy1.frameX * frameWidth1, 0, frameWidth1, frameHeight1,
+                enemy1.x, enemy1.y, enemy1.size, enemy1.size
+            );
+        }
+
+        ctx.restore();
+    }
     // draw enemy 2
-if (enemy2) {
-    const frameWidth2 = enemy2Sprite.width / (enemy2.maxFrame + 1);
-    const frameHeight2 = enemy2Sprite.height;
-    ctx.drawImage(
-        enemy2Sprite,
-        enemy2.frameX * frameWidth2, 0, frameWidth2, frameHeight2,
-        enemy2.x, enemy2.y, enemy2.size, enemy2.size
-    );
-}
+    if (enemy2) {
+        const frameWidth2 = enemy2Sprite.width / (enemy2.maxFrame + 1);
+        const frameHeight2 = enemy2Sprite.height;
+
+        ctx.save();
+
+        if (enemy2.direction === "right") {
+            ctx.translate(enemy2.x + enemy2.size, enemy2.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+                enemy2Sprite,
+                enemy2.frameX * frameWidth2, 0, frameWidth2, frameHeight2,
+                0, 0, enemy2.size, enemy2.size
+            );
+        } else {
+            ctx.drawImage(
+                enemy2Sprite,
+                enemy2.frameX * frameWidth2, 0, frameWidth2, frameHeight2,
+                enemy2.x, enemy2.y, enemy2.size, enemy2.size
+            );
+        }
+
+        ctx.restore();
+    }
     // draw enemy 3
-if (enemy3) {
-    const frameWidth3 = enemy3Sprite.width / (enemy3.maxFrame + 1);
-    const frameHeight3 = enemy3Sprite.height;
-    ctx.drawImage(
-        enemy3Sprite,
-        enemy3.frameX * frameWidth3, 0, frameWidth3, frameHeight3,
-        enemy3.x, enemy3.y, enemy3.size, enemy3.size
-    );
-}
+    if (enemy3) {
+        const frameWidth3 = enemy3Sprite.width / (enemy3.maxFrame + 1);
+        const frameHeight3 = enemy3Sprite.height;
+
+        ctx.save();
+
+        if (enemy3.direction === "right") {
+            ctx.translate(enemy3.x + enemy3.size, enemy3.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+                enemy3Sprite,
+                enemy3.frameX * frameWidth3, 0, frameWidth3, frameHeight3,
+                0, 0, enemy3.size, enemy3.size
+            );
+        } else {
+            ctx.drawImage(
+                enemy3Sprite,
+                enemy3.frameX * frameWidth3, 0, frameWidth3, frameHeight3,
+                enemy3.x, enemy3.y, enemy3.size, enemy3.size
+            );
+        }
+
+        ctx.restore();
+    }
 
     // draw level 4 bat
     if (
