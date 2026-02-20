@@ -300,6 +300,25 @@ let greenBossFrameIndex = 0;
 let greenBossFrameCounter = 0;
 let greenBossFrameDelay = 18;
 
+// green boss slam animation frames (level 7)
+const greenBossSlamFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/bossSlamAnimation_" + i + ".png";
+    greenBossSlamFrames.push(img);
+}
+
+let greenBossSlamFrameIndex = 0;
+let greenBossSlamFrameCounter = 0;
+
+let bossSlamCooldown = 0;
+let bossSlamHoldTimer = 0;
+let bossSlamTriggered = false;
+
+let bossState = "walk";
+
+
 let level7Fires = [];
 
 // level 7 fire frames
@@ -796,8 +815,8 @@ function loadLevel(levelIndex) {
     if (levelIndex === 6) {
 
         greenBoss = {
-            x: 828,
-            y: 605,
+            x: 521,
+            y: 570,
             size: 180,
             speed: 1.2,
             direction: "right"
@@ -805,6 +824,14 @@ function loadLevel(levelIndex) {
 
         greenBossFrameIndex = 0;
         greenBossFrameCounter = 0;
+
+        // reset slam attack
+        bossIsSlamming = false;
+        bossSlamCooldown = 0;
+        greenBossSlamFrameIndex = 0;
+        greenBossSlamFrameCounter = 0;
+        bossSlamTriggered = false;
+        bossState = "walk";
 
         // spawn level 7 fires
         level7Fires = [
@@ -1321,55 +1348,85 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
-    // green boss movement + animation level 7
+    // green boss movement + animations level 7
     if (greenBoss && currentLevel === 6) {
 
-        // get centre of player
         let playerCenterX = player.x + player.size / 2;
         let playerCenterY = player.y + player.size / 2;
 
-        // get centre of boss
         let bossCenterX = greenBoss.x + greenBoss.size / 2;
         let bossCenterY = greenBoss.y + greenBoss.size / 2;
 
-        // distance from boss to player centre
         let dx = playerCenterX - bossCenterX;
         let dy = playerCenterY - bossCenterY;
         let dist = Math.sqrt(dx * dx + dy * dy);
 
-        // only move if not too close
-        if (dist > 5) {
-
-            dx /= dist;
-            dy /= dist;
-
-            greenBoss.x += dx * greenBoss.speed * deltaTime;
-            greenBoss.y += dy * greenBoss.speed * deltaTime;
-
-            // only change direction if boss moving left or right
-            if (Math.abs(dx) > 0.1) {
-                if (dx < 0) {
-                    greenBoss.direction = "left";
-                } else {
-                    greenBoss.direction = "right";
-                }
-            }
-
-            // animate boss only when moving
-            greenBossFrameCounter++;
-
-            if (greenBossFrameCounter >= greenBossFrameDelay) {
-                greenBossFrameCounter = 0;
-                greenBossFrameIndex++;
-
-                if (greenBossFrameIndex >= greenBossFrames.length) {
-                    greenBossFrameIndex = 0;
-                }
-            }
-
+        // slam cooldown timer
+        if (bossSlamCooldown > 0) {
+            bossSlamCooldown -= 1 * deltaTime;
         }
 
-    }
+        // start slam if close
+        if (bossState === "walk" && dist < 120 && bossSlamCooldown <= 0) {
+            bossState = "slam";
+            greenBossSlamFrameIndex = 0;
+            greenBossSlamFrameCounter = 0;
+        }
+
+        // slam state
+        if (bossState === "slam") {
+
+            // stop moving and SLAM!!!
+            greenBossSlamFrameCounter += 1 * deltaTime;
+
+            if (greenBossSlamFrameCounter >= 6) {
+                greenBossSlamFrameCounter = 0;
+                greenBossSlamFrameIndex++;
+            }
+
+            // when all frames played go back to walking
+            if (greenBossSlamFrameIndex >= greenBossSlamFrames.length) {
+                bossState = "walk";
+                bossSlamCooldown = 180;
+                greenBossSlamFrameIndex = 0;
+            }
+        }
+
+        // walk state
+        else if (bossState === "walk") {
+
+            let bossStopDistance = 90;
+
+            if (dist > bossStopDistance) {
+
+                dx /= dist;
+                dy /= dist;
+
+                greenBoss.x += dx * greenBoss.speed * deltaTime;
+                greenBoss.y += dy * greenBoss.speed * deltaTime;
+
+                if (Math.abs(dx) > 0.1) {
+                    if (dx < 0) {
+                        greenBoss.direction = "left";
+                    } else {
+                        greenBoss.direction = "right";
+                    }
+                }
+
+                // walk animation
+                greenBossFrameCounter++;
+
+                if (greenBossFrameCounter >= greenBossFrameDelay) {
+                    greenBossFrameCounter = 0;
+                    greenBossFrameIndex++;
+
+                    if (greenBossFrameIndex >= greenBossFrames.length) {
+                        greenBossFrameIndex = 0;
+                    }
+                }
+            }
+        }
+}
 
     // animate level 7 fires
     if (currentLevel === 6 && level7Fires.length > 0) {
@@ -2372,31 +2429,50 @@ if (currentDrag) {
     }
 
     // draw green boss level 7
-    if (
-        greenBoss &&
-        greenBossFrames[greenBossFrameIndex] &&
-        greenBossFrames[greenBossFrameIndex].complete
-    ) {
+    if (greenBoss) {
+
         ctx.save();
 
-        if (greenBoss.direction === "left") {
-            ctx.translate(greenBoss.x + greenBoss.size, greenBoss.y);
-            ctx.scale(-1, 1);
+        let bossCenterX = greenBoss.x + greenBoss.size / 2;
+        let bossCenterY = greenBoss.y + greenBoss.size / 2;
+
+        ctx.translate(bossCenterX, bossCenterY);
+
+        let bossImage;
+        let bossDrawSize = greenBoss.size;
+
+        // slam frames are bigger than walk frames so it looks better
+        if (bossState === "slam") {
+            bossImage = greenBossSlamFrames[greenBossSlamFrameIndex];
+            bossDrawSize = greenBoss.size * 1.55;
+        }
+        else {
+            bossImage = greenBossFrames[greenBossFrameIndex];
+        }
+
+        // flip logic
+        if (bossState === "slam") {
+
+            if (greenBoss.direction === "right") {
+                ctx.scale(-1, 1);
+            }
+
+        } else {
+
+            if (greenBoss.direction === "left") {
+                ctx.scale(-1, 1);
+            }
+
+        }
+
+        if (bossImage && bossImage.complete) {
 
             ctx.drawImage(
-                greenBossFrames[greenBossFrameIndex],
-                0,
-                0,
-                greenBoss.size,
-                greenBoss.size
-            );
-        } else {
-            ctx.drawImage(
-                greenBossFrames[greenBossFrameIndex],
-                greenBoss.x,
-                greenBoss.y,
-                greenBoss.size,
-                greenBoss.size
+                bossImage,
+                -bossDrawSize / 2,
+                -bossDrawSize / 2,
+                bossDrawSize,
+                bossDrawSize
             );
         }
 
