@@ -1596,7 +1596,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     }
 
 
-    // player collects trophy = game end
+    // player collects trophy and ends game
     if (currentLevel === 6 && trophy && trophy.spawned) {
 
         // smaller centred player hitbox
@@ -2290,6 +2290,20 @@ function draw() {
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
+
+    // textbox above player
+    const rect = canvas.getBoundingClientRect();
+
+    const scaleX = rect.width / canvas.width;
+    const scaleY = rect.height / canvas.height;
+
+    textBox.style.left =
+        rect.left + (player.x + player.size / 2) * scaleX + "px";
+
+    textBox.style.top =
+        rect.top + (player.y - 15) * scaleY + "px";
+
+    textBox.style.transform = "translate(-50%, -100%)";
 
 
     // draw lava strip 
