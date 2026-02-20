@@ -334,6 +334,11 @@ let fireLevel7FrameIndex = 0;
 let fireLevel7FrameCounter = 0;
 let fireLevel7FrameDelay = 13;
 
+// level 7 boss arrow sprite
+const bossArrowSprite = new Image();
+bossArrowSprite.src = "assets/images/bossArrow.png";
+let bossArrow = null;
+let spacePressed = false;
 
 
 
@@ -1428,6 +1433,58 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
 }
 
+    // shoot boss arrow level 7
+    if (currentLevel === 6 && pressedKeys[" "] && !bossArrow && !spacePressed) {
+
+        spacePressed = true;
+        let arrowSpeed = 12;
+        let arrowWidth = 60;
+        let arrowHeight = 40;
+
+        let playerCenterX = player.x + player.size / 2;
+        let playerCenterY = player.y + player.size / 2;
+
+        bossArrow = {
+            x: playerCenterX - arrowWidth / 2,
+            y: playerCenterY - arrowHeight / 2,
+            width: arrowWidth,
+            height: arrowHeight,
+            speed: arrowSpeed,
+            direction: player.direction
+        };
+
+        shootSound.currentTime = 0;
+        shootSound.play();
+    }
+
+    // move boss arrow level 7
+    if (bossArrow) {
+
+        if (bossArrow.direction === "right") bossArrow.x += bossArrow.speed * deltaTime;
+        else if (bossArrow.direction === "left") bossArrow.x -= bossArrow.speed * deltaTime;
+        else if (bossArrow.direction === "up") bossArrow.y -= bossArrow.speed * deltaTime;
+        else if (bossArrow.direction === "down") bossArrow.y += bossArrow.speed * deltaTime;
+
+        // remove if off screen
+        if (
+            bossArrow.x > canvas.width ||
+            bossArrow.x + bossArrow.width < 0 ||
+            bossArrow.y > canvas.height ||
+            bossArrow.y + bossArrow.height < 0
+        ) {
+            bossArrow = null;
+        }
+    }
+
+    // boss arrow hits green boss
+    if (currentLevel === 6 && greenBoss && bossArrow && isColliding(bossArrow, greenBoss)) {
+
+        enemyHitSound.currentTime = 0;
+        enemyHitSound.play();
+
+        bossArrow = null;
+    }
+
     // animate level 7 fires
     if (currentLevel === 6 && level7Fires.length > 0) {
 
@@ -1785,8 +1842,9 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
 
     // shoot arrow if bow collected
-    if (bow && bow.collected && pressedKeys[" "] && !arrow) {
+    if (bow && bow.collected && pressedKeys[" "] && !arrow && !spacePressed) {
 
+        spacePressed = true;
         let arrowSpeed = 12;
         let arrowWidth = 80;
         let arrowHeight = 40;
@@ -1810,6 +1868,11 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
         shootSound.currentTime = 0;
         shootSound.play();
+    }
+
+    // reset tap shoot
+    if (!pressedKeys[" "]) {
+        spacePressed = false;
     }
 
     // move arrow and handle collisions
@@ -2501,6 +2564,26 @@ if (currentDrag) {
 
     }
 
+    // draw boss arrow level 7
+    if (bossArrow) {
+
+        ctx.save();
+        ctx.translate(bossArrow.x + bossArrow.width / 2, bossArrow.y + bossArrow.height / 2);
+
+        if (bossArrow.direction === "left") ctx.rotate(Math.PI);
+        else if (bossArrow.direction === "up") ctx.rotate(-Math.PI/2);
+        else if (bossArrow.direction === "down") ctx.rotate(Math.PI/2);
+
+        ctx.drawImage(
+            bossArrowSprite,
+            -bossArrow.width / 2,
+            -bossArrow.height / 2,
+            bossArrow.width,
+            bossArrow.height
+        );
+
+        ctx.restore();
+    }
 
 
 
