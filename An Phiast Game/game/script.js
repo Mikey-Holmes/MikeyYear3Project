@@ -341,6 +341,23 @@ bossArrowSprite.src = "assets/images/bossArrow.png";
 let bossArrow = null;
 let spacePressed = false;
 
+// trophy animation
+const trophyFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/trophy_" + i + ".png";
+    trophyFrames.push(img);
+}
+
+let trophy = null;
+let trophyFrameIndex = 0;
+let trophyFrameCounter = 0;
+let trophyFrameDelay = 20;
+let trophySpawnTimer = 0;
+let trophySpawnDelay = 120;// after 2 seconds
+let trophySpawning = false;
+
 
 
 // levels definition
@@ -831,6 +848,19 @@ function loadLevel(levelIndex) {
         greenBossFrameIndex = 0;
         greenBossFrameCounter = 0;
 
+        // trophy soawns after boss dies
+        trophy = {
+                x: 1300,
+                y: 500,
+                size: 120,//scaled up
+                spawned: false
+            };
+
+        trophyFrameIndex = 0;
+        trophyFrameCounter = 0;
+        trophySpawnTimer = 0;
+        trophySpawning = false;
+
         // reset slam attack
         bossIsSlamming = false;
         bossSlamCooldown = 0;
@@ -857,6 +887,7 @@ function loadLevel(levelIndex) {
     } else {
         greenBoss = null;
         level7Fires = [];
+        trophy = null;
     }
 
 }
@@ -1524,8 +1555,73 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         // boss defeated
         if (bossScore >= 100) {
 
-            greenBoss = null;     // remove boss
-            bossState = "walk";   // stop slam state
+            greenBoss = null;
+            bossState = "walk";
+
+            // start delayed trophy spawn
+            if (!trophySpawning) {
+                trophySpawning = true;
+                trophySpawnTimer = 0;
+            }
+        }
+    }
+
+
+    // delayed trophy spawn after boss dies
+    if (currentLevel === 6 && trophySpawning && trophy && !trophy.spawned) {
+
+        trophySpawnTimer++;
+
+        if (trophySpawnTimer >= trophySpawnDelay) {
+
+            trophy.spawned = true;
+            trophySpawning = false;
+        }
+    }
+
+
+    // animate trophy level 7
+    if (currentLevel === 6 && trophy && trophy.spawned) {
+
+        trophyFrameCounter++;
+
+        if (trophyFrameCounter >= trophyFrameDelay) {
+            trophyFrameCounter = 0;
+            trophyFrameIndex++;
+
+            if (trophyFrameIndex >= trophyFrames.length) {
+                trophyFrameIndex = 0;
+            }
+        }
+    }
+
+
+    // player collects trophy = game end
+    if (currentLevel === 6 && trophy && trophy.spawned) {
+
+        // smaller centred player hitbox
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        // smaller centred trophy hitbox
+        const trophyPadding = 35;
+
+        const trophyHitbox = {
+            x: trophy.x + trophyPadding,
+            y: trophy.y + trophyPadding,
+            size: trophy.size - trophyPadding * 2
+        };
+
+        if (isColliding(playerHitbox, trophyHitbox)) {
+
+            trophy.spawned = false;
+
+            if (showEnding) {
+                endGameSplashes();
+            }
         }
     }
 
@@ -2632,6 +2728,24 @@ if (currentDrag) {
         );
 
         ctx.restore();
+    }
+
+    // draw trophy level 7
+    if (
+        currentLevel === 6 &&
+        trophy &&
+        trophy.spawned &&
+        trophyFrames[trophyFrameIndex] &&
+        trophyFrames[trophyFrameIndex].complete
+    ) {
+
+        ctx.drawImage(
+            trophyFrames[trophyFrameIndex],
+            trophy.x,
+            trophy.y,
+            trophy.size,
+            trophy.size
+        );
     }
 
 
