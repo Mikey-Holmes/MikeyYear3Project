@@ -623,7 +623,7 @@ function updateHintText() {
     } else if (currentLevel === 1) {
         hintBox.textContent = "It's dark... find the key and the exit to escape!";
     } else if (currentLevel === 2) {
-        hintBox.textContent = "Defeat enemies to raise your score and reveal the key!";
+        hintBox.textContent = "Grab the bow and shoot the enemies! A key will appear when you reach a score of 50!";
     } else if (currentLevel === 3) {
         hintBox.textContent = "Lava ahead! Be careful, beware of the bat.. !";
     } else if (currentLevel === 4) {
@@ -631,7 +631,7 @@ function updateHintText() {
     } else if (currentLevel === 5) {
         hintBox.textContent = "Ah moving platforms! Time your jumps carefully and watch out for the dragon attacks!";
     } else if (currentLevel === 6) {
-        hintBox.textContent = "Final level! Beware of the green boss and his attacks, keep your distance and defeat him to escape the cave!";
+        hintBox.textContent = "Final level! Beware of the green boss and his attacks, keep your distance, shoot the boss and defeat him to escape the cave!";
     }
 }
 
