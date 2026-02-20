@@ -798,7 +798,7 @@ function loadLevel(levelIndex) {
         greenBoss = {
             x: 828,
             y: 605,
-            size: 140,
+            size: 180,
             speed: 1.2,
             direction: "right"
         };
@@ -1324,36 +1324,51 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // green boss movement + animation level 7
     if (greenBoss && currentLevel === 6) {
 
-        let dx = player.x - greenBoss.x;
-        let dy = player.y - greenBoss.y;
+        // get centre of player
+        let playerCenterX = player.x + player.size / 2;
+        let playerCenterY = player.y + player.size / 2;
+
+        // get centre of boss
+        let bossCenterX = greenBoss.x + greenBoss.size / 2;
+        let bossCenterY = greenBoss.y + greenBoss.size / 2;
+
+        // distance from boss to player centre
+        let dx = playerCenterX - bossCenterX;
+        let dy = playerCenterY - bossCenterY;
         let dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist > 0) {
+        // only move if not too close
+        if (dist > 5) {
+
             dx /= dist;
             dy /= dist;
 
             greenBoss.x += dx * greenBoss.speed * deltaTime;
             greenBoss.y += dy * greenBoss.speed * deltaTime;
 
-            // set facing direction
-            if (dx < 0) {
-                greenBoss.direction = "left";
-            } else {
-                greenBoss.direction = "right";
+            // only change direction if boss moving left or right
+            if (Math.abs(dx) > 0.1) {
+                if (dx < 0) {
+                    greenBoss.direction = "left";
+                } else {
+                    greenBoss.direction = "right";
+                }
             }
+
+            // animate boss only when moving
+            greenBossFrameCounter++;
+
+            if (greenBossFrameCounter >= greenBossFrameDelay) {
+                greenBossFrameCounter = 0;
+                greenBossFrameIndex++;
+
+                if (greenBossFrameIndex >= greenBossFrames.length) {
+                    greenBossFrameIndex = 0;
+                }
+            }
+
         }
 
-        // animate boss
-        greenBossFrameCounter++;
-
-        if (greenBossFrameCounter >= greenBossFrameDelay) {
-            greenBossFrameCounter = 0;
-            greenBossFrameIndex++;
-        }
-
-        if (greenBossFrameIndex >= greenBossFrames.length) {
-            greenBossFrameIndex = 0;
-        }
     }
 
     // animate level 7 fires
@@ -1714,15 +1729,24 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
     // shoot arrow if bow collected
     if (bow && bow.collected && pressedKeys[" "] && !arrow) {
+
         let arrowSpeed = 12;
-        let arrowX = player.x + player.size / 2;
-        let arrowY = player.y + player.size / 2;
+        let arrowWidth = 80;
+        let arrowHeight = 40;
+
+        // get player centre
+        let playerCenterX = player.x + player.size / 2;
+        let playerCenterY = player.y + player.size / 2;
+
+        // spawn arrow centred on player
+        let arrowX = playerCenterX - arrowWidth / 2;
+        let arrowY = playerCenterY - arrowHeight / 2;
 
         arrow = {
             x: arrowX,
             y: arrowY,
-            width: 80,
-            height: 40,
+            width: arrowWidth,
+            height: arrowHeight,
             speed: arrowSpeed,
             direction: player.direction
         };
