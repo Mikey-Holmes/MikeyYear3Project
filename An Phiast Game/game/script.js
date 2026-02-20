@@ -154,6 +154,7 @@ let gameState = "menu";
 const background = new Image();
 
 let score = 0; // level 3 score
+let bossScore = 0; // level 7 score
 let health = 3; // player health
 let invincible = false;
 
@@ -626,7 +627,7 @@ function loadLevel(levelIndex) {
     player.frameX = 0;
     player.frameCounter = 0;
 
-    if (levelIndex === 2) {
+    if (levelIndex === 2 || levelIndex === 6) {
     health = 3; // reset health for final level
     } else {
         health = 0; // no health display for earlier levels
@@ -837,6 +838,10 @@ function loadLevel(levelIndex) {
         greenBossSlamFrameCounter = 0;
         bossSlamTriggered = false;
         bossState = "walk";
+        
+        //heal and score for boss fight
+        health = 3;
+        bossScore = 0;
 
         // spawn level 7 fires
         level7Fires = [
@@ -1482,7 +1487,15 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         enemyHitSound.currentTime = 0;
         enemyHitSound.play();
 
+        bossScore += 5;
         bossArrow = null;
+
+        // boss defeated
+        if (bossScore >= 100) {
+
+            greenBoss = null;     // remove boss
+            bossState = "walk";   // stop slam state
+        }
     }
 
     // animate level 7 fires
@@ -2006,14 +2019,19 @@ if (!invincible && currentLevel === 2) {
     }
 
 
-    if (
-        touchingExit &&
-        !wasTouchingExit &&
+        if ( touchingExit && !wasTouchingExit &&
         (
+            // levels 0 - 2 need key
+            ((currentLevel === 0 || currentLevel === 1 || currentLevel === 2) && key.collected) ||
+
+            // parkour levels auto exit
             (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) ||
-            (key.collected)
+
+            // level 7 needs boss score
+            (currentLevel === 6 && bossScore >= 100)
         )
-    ) {
+    ) 
+    {
         levelCompleteSound.currentTime = 0;
         levelCompleteSound.play();
 
@@ -2663,24 +2681,58 @@ if (enemy3) {
 
 
 
-    // draw score only for level 3
+    // level 3 UI
     if (currentLevel === 2) {
         ctx.fillStyle = "white";
         ctx.font = "24px Arial";
-        ctx.textAlign = "center";  // centers text horizontally
+        ctx.textAlign = "center";  
         ctx.fillText("Score: " + score, canvas.width / 2, 40);
-        ctx.textAlign = "left"; // reset alignment
+        ctx.textAlign = "left";
     }
 
-    if (currentLevel === 2) {
-        const heartSize = 60; // size of each heart
-        const spacing = 10; // space between hearts
+        if (currentLevel === 2) {
+        const heartSize = 60; 
+        const spacing = 10; 
         const totalWidth = health * (heartSize + spacing) - spacing;
-        const startX = (canvas.width - totalWidth) / 2; // center
-        const y = 50;; // vertical position
+        const startX = (canvas.width - totalWidth) / 2; 
+        const y = 50;
 
         for (let i = 0; i < health; i++) {
-            ctx.drawImage(heartSprite, startX + i * (heartSize + spacing), y, heartSize, heartSize);
+            ctx.drawImage(
+                heartSprite,
+                startX + i * (heartSize + spacing),
+                y,
+                heartSize,
+                heartSize
+            );
+        }
+    }
+
+    // level 7 UI
+    if (currentLevel === 6) {
+
+        // the score
+        ctx.fillStyle = "white";
+        ctx.font = "24px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Boss Score: " + bossScore + "/100", canvas.width / 2, 90);
+        ctx.textAlign = "left";
+
+        // heart sprites
+        const heartSize = 60;
+        const spacing = 10;
+        const totalWidth = health * (heartSize + spacing) - spacing;
+        const startX = (canvas.width - totalWidth) / 2;
+        const y = 120;
+
+        for (let i = 0; i < health; i++) {
+            ctx.drawImage(
+                heartSprite,
+                startX + i * (heartSize + spacing),
+                y,
+                heartSize,
+                heartSize
+            );
         }
     }
 
