@@ -9,7 +9,7 @@ function resizeCanvas() {
     const scaleX = window.innerWidth / GAME_WIDTH;
     const scaleY = window.innerHeight / GAME_HEIGHT;
 
-    // use smaller scale to keep aspect ratio
+    // keeps aspect ratio
     const scale = Math.min(scaleX, scaleY);
 
     // scale canvas visually
@@ -2172,6 +2172,35 @@ if (!invincible && currentLevel === 2) {
     }
 }
 
+    // level 7 death (boss fight)
+    if (currentLevel === 6 && health <= 0) {
+
+        playerDeathSound.currentTime = 0;
+        playerDeathSound.play();
+
+        setTimeout(() => {
+
+            bossScore = 0;
+            health = 3;
+
+            currentLevel = 5;
+            loadLevel(5);
+
+            // show text after loads
+            setTimeout(() => {
+
+                textBox.innerHTML = "<p>I have been defeated! ... wait NOT AGAIN!!!</p>";
+                textBox.classList.remove("hidden");
+
+                setTimeout(() => {
+                    textBox.classList.add("hidden");
+                }, 2000);
+
+            }, 200);
+
+        }, 500);
+    }
+
     // remove enemies and spawn key if score hits 50 in level 3
     if (currentLevel === 2 && score >= 50 && !key.spawned) {
         enemy1 = null;
@@ -3000,7 +3029,7 @@ if (currentDrag) {
     }
 
 
-    // apply lighting effect only for level 2
+    // lighting effect only for level 2
     if (currentLevel === 1) {
     ctx.save();
 
