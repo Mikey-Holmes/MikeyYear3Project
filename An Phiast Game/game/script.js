@@ -612,6 +612,18 @@ const levels = [
         ],
         key: {},
         exitWall: {}
+    },
+    
+    {
+    backgroundSrc: "assets/images/background_8.png",//background lvl 8
+        walls: [
+            {x: 483, y: 139, width: 965, height: 3},
+            {x: 1454, y: 141, width: 3, height: 150},
+            {x: 1458, y: 289, width: 266, height: 3},
+
+        ],
+        key: {},
+        exitWall: {}
     }
 ];
 
@@ -973,7 +985,7 @@ window.addEventListener("keydown", function(event) {
     let key = event.key.toLowerCase();
     pressedKeys[key] = true;
 
-    // level skip debug controls
+    // debug controls
     if (levelSkipEnabled) {
 
         if (key === "t") {
@@ -2398,7 +2410,7 @@ if (!invincible && currentLevel === 2) {
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
 let currentDrag = null; 
-let debugMode = false;
+let debugMode = true;
 
 canvas.addEventListener("mousedown", (e) => {
     if (gameState !== "playing") return;
@@ -3193,7 +3205,7 @@ startButton.addEventListener("click", function() {
 
         }, 2000);
 
-    }, 1000); // 18 second delay
+    }, 50); // 18 second delay
 
 });
 
