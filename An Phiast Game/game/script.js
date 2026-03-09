@@ -157,7 +157,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 6.0, // 6 is default, adjusted for testing
+    speed: 10.0, // 6 is default, adjusted for testing
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -214,6 +214,21 @@ for (let i = 1; i <= 4; i++) {
 let lavaFrameIndex = 0;
 let lavaFrameCounter = 0;
 let lavaFrameDelay = 40;
+
+// lava trap animation frames 
+const lavaTrapFrames = [];
+
+for (let i = 1; i <= 11; i++) {
+    const img = new Image();
+    img.src = "assets/images/lavatrap_" + i + ".png";
+    lavaTrapFrames.push(img);
+}
+
+let lavaTraps = [];
+
+let lavaTrapFrameIndex = 0;
+let lavaTrapFrameCounter = 0;
+let lavaTrapFrameDelay = 40;
 
 
 let lastTime = 0; // for delta time
@@ -608,18 +623,26 @@ const levels = [
             {x: 1333, y: 723, width: 126, height: 16},
             {x: 1383, y: 709, width: 75, height: 14},
             {x: 1428, y: 689, width: 36, height: 16},
-
         ],
         key: {},
         exitWall: {}
     },
-    
+
     {
     backgroundSrc: "assets/images/background_8.png",//background lvl 8
         walls: [
             {x: 483, y: 139, width: 965, height: 3},
             {x: 1454, y: 141, width: 3, height: 150},
             {x: 1458, y: 289, width: 266, height: 3},
+            {x: 1721, y: 292, width: 2, height: 502},
+            {x: 1458, y: 787, width: 266, height: 2},
+            {x: 1457, y: 789, width: 1, height: 154},
+            {x: 467, y: 935, width: 987, height: 3},
+            {x: 467, y: 792, width: 1, height: 140},
+            {x: 199, y: 785, width: 269, height: 3},
+            {x: 195, y: 285, width: 1, height: 499},
+            {x: 196, y: 283, width: 271, height: 9},
+            {x: 466, y: 138, width: 2, height: 145},
 
         ],
         key: {},
@@ -953,6 +976,21 @@ function loadLevel(levelIndex) {
         trophy = null;
     }
 
+    if (levelIndex === 7) {
+
+    lavaTraps = [
+
+        { x: 222, y: 670, size: 120, frameOffset: Math.floor(Math.random() * lavaTrapFrames.length) },
+        { x: 633, y: 450, size: 120, frameOffset: Math.floor(Math.random() * lavaTrapFrames.length) },
+        { x: 1070, y: 532, size: 120, frameOffset: Math.floor(Math.random() * lavaTrapFrames.length) },
+        { x: 1530, y: 381, size: 120, frameOffset: Math.floor(Math.random() * lavaTrapFrames.length) }
+
+    ];
+    
+    } else {
+        lavaTraps = [];
+    }
+
 }
 
 function skipLevel() {
@@ -1140,6 +1178,18 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             lavaSplash = null;
         }
 
+    }
+
+    // animate lava traps
+    lavaTrapFrameCounter++;
+
+    if (lavaTrapFrameCounter >= lavaTrapFrameDelay) {
+        lavaTrapFrameCounter = 0;
+        lavaTrapFrameIndex++;
+
+        if (lavaTrapFrameIndex >= lavaTrapFrames.length) {
+            lavaTrapFrameIndex = 0;
+        }
     }
 
 
@@ -2942,6 +2992,27 @@ if (debugMode && currentDrag) {
             trophy.size,
             trophy.size
         );
+    }
+    
+    if (currentLevel === 7) {
+
+        for (let trap of lavaTraps) {
+
+            let frame =
+                lavaTrapFrames[
+                    (lavaTrapFrameIndex + trap.frameOffset) % lavaTrapFrames.length
+                ];
+
+            ctx.drawImage(
+                frame,
+                trap.x,
+                trap.y,
+                trap.size,
+                trap.size
+            );
+
+        }
+
     }
 
 
