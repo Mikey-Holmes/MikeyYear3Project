@@ -430,6 +430,21 @@ let bigSpikeFrameIndex = 0;
 let bigSpikeFrameCounter = 0;
 let bigSpikeFrameDelay = 22;
 
+// small spike animation frames
+const smallSpikeFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/smallspike_" + i + ".png";
+    smallSpikeFrames.push(img);
+}
+
+let smallSpikes = [];
+let smallSpikeFrameIndex = 0;
+let smallSpikeFrameCounter = 0;
+let smallSpikeFrameDelay = 25;
+
+
 
 
 // levels definition
@@ -1016,7 +1031,18 @@ function loadLevel(levelIndex) {
     bigSpikeFrameIndex = 0;
     bigSpikeFrameCounter = 0;
 
-    
+
+    smallSpikes = [
+
+        { x: 672, y: 618, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
+        { x: 895, y: 370, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
+        { x: 1050, y: 370, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) }
+
+    ];
+
+    smallSpikeFrameIndex = 0;
+    smallSpikeFrameCounter = 0;
+        
 
 }
 
@@ -1229,6 +1255,20 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
         if (bigSpikeFrameIndex >= bigSpikeFrames.length) {
             bigSpikeFrameIndex = 0;
+        }
+
+    }
+
+    // animate small spikes
+    smallSpikeFrameCounter++;
+
+    if (smallSpikeFrameCounter >= smallSpikeFrameDelay) {
+
+        smallSpikeFrameCounter = 0;
+        smallSpikeFrameIndex++;
+
+        if (smallSpikeFrameIndex >= smallSpikeFrames.length) {
+            smallSpikeFrameIndex = 0;
         }
 
     }
@@ -3079,6 +3119,28 @@ if (debugMode && currentDrag) {
 
     }
 
+    // draw small spikes level 8
+    if (currentLevel === 7) {
+
+        for (let spike of smallSpikes) {
+
+            let frame =
+                smallSpikeFrames[
+                    (smallSpikeFrameIndex + spike.frameOffset) % smallSpikeFrames.length
+                ];
+
+            ctx.drawImage(
+                frame,
+                spike.x,
+                spike.y,
+                spike.size,
+                spike.size
+            );
+
+        }
+
+    }
+ 
 
     // draw player sprite
     const sprite = sprites[player.direction];
