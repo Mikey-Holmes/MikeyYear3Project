@@ -416,6 +416,20 @@ let trophySpawnTimer = 0;
 let trophySpawnDelay = 120;// after 2 seconds
 let trophySpawning = false;
 
+// big spike animation frames
+const bigSpikeFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/bigspike_" + i + ".png";
+    bigSpikeFrames.push(img);
+}
+
+let bigSpikes = [];
+let bigSpikeFrameIndex = 0;
+let bigSpikeFrameCounter = 0;
+let bigSpikeFrameDelay = 22;
+
 
 
 // levels definition
@@ -991,6 +1005,19 @@ function loadLevel(levelIndex) {
         lavaTraps = [];
     }
 
+    bigSpikes = [
+
+        { x: 575, y: 600, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) },
+        { x: 960, y: 366, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) },
+        { x: 1599, y: 522, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) }
+
+    ];
+
+    bigSpikeFrameIndex = 0;
+    bigSpikeFrameCounter = 0;
+
+    
+
 }
 
 function skipLevel() {
@@ -1190,6 +1217,20 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         if (lavaTrapFrameIndex >= lavaTrapFrames.length) {
             lavaTrapFrameIndex = 0;
         }
+    }
+
+    // animate big spikes
+    bigSpikeFrameCounter++;
+
+    if (bigSpikeFrameCounter >= bigSpikeFrameDelay) {
+
+        bigSpikeFrameCounter = 0;
+        bigSpikeFrameIndex++;
+
+        if (bigSpikeFrameIndex >= bigSpikeFrames.length) {
+            bigSpikeFrameIndex = 0;
+        }
+
     }
 
 
@@ -2994,6 +3035,7 @@ if (debugMode && currentDrag) {
         );
     }
     
+    //draw lava traps level 8
     if (currentLevel === 7) {
 
         for (let trap of lavaTraps) {
@@ -3015,6 +3057,27 @@ if (debugMode && currentDrag) {
 
     }
 
+    // draw big spikes level 8
+    if (currentLevel === 7) {
+
+        for (let spike of bigSpikes) {
+
+            let frame =
+                bigSpikeFrames[
+                    (bigSpikeFrameIndex + spike.frameOffset) % bigSpikeFrames.length
+                ];
+
+            ctx.drawImage(
+                frame,
+                spike.x,
+                spike.y,
+                spike.size,
+                spike.size
+            );
+
+        }
+
+    }
 
 
     // draw player sprite
