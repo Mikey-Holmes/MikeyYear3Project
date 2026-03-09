@@ -3120,31 +3120,43 @@ document.getElementById("backButton").addEventListener("click", function() {
 
 // start game
 startButton.addEventListener("click", function() {
+    
+    // hide menu
     menuDiv.classList.add("hidden");
-    gameState = "playing";
 
-    backgroundSound.play();// plays music
+    // show scroll
+    document.getElementById("scrollIntro").classList.remove("hidden");
 
-    // show first text
-    textBox.innerHTML = "<p>How did I get here?!</p>";
-    textBox.classList.remove("hidden");
+    // wait then start game
+    setTimeout(function(){
 
-    // fade out first text after 3 seconds
-    setTimeout(function() {
-        textBox.classList.add("hidden");
+        document.getElementById("scrollIntro").classList.add("hidden");
 
-        // after show second text
+        gameState = "playing";
+
+        backgroundSound.play();
+
+        // show first textbox
+        textBox.innerHTML = "<p>How did I get here?!</p>";
+        textBox.classList.remove("hidden");
+
         setTimeout(function() {
-            textBox.innerHTML = "<p>I need to find a way out</p>";
-            textBox.classList.remove("hidden");
+            textBox.classList.add("hidden");
 
-            // fade out after 3 seconds
             setTimeout(function() {
-                textBox.classList.add("hidden");
-            }, 3000);
+                textBox.innerHTML = "<p>I need to find a way out</p>";
+                textBox.classList.remove("hidden");
 
-        }, 1000); // small delay
-    }, 2000);
+                setTimeout(function() {
+                    textBox.classList.add("hidden");
+                }, 3000);
+
+            }, 1000);
+
+        }, 2000);
+
+    }, 18000); // 18 second delay
+
 });
 
 function endGameSplashes() {

@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "ScrollFont";
+    src: url("assets/fonts/scroll_font.otf") format("truetype");
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -195,3 +200,60 @@ canvas {
   transform: scale(1);
 }
 
+#scrollIntro {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 50;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
+}
+
+#scrollIntro:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+
+#scrollContent {
+
+    width: 1100px;
+    height: 800px;
+
+    background: url("assets/images/scroll.png") no-repeat center;
+    background-size: contain;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 150px 220px 160px 220px;
+
+    text-align: center;
+    color: #2a1a05;
+
+    font-family: "ScrollFont", serif;
+    font-size: 32px;
+    line-height: 1.4;
+    letter-spacing: 1px;
+}
+
+#scrollContent p {
+    margin-bottom: 8px;
+    max-width: 500px;
+}
+
+#scrollContinue {
+    margin-top: 20px;
+    padding: 8px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
