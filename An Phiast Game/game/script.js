@@ -191,6 +191,8 @@ let sparkleFrameDelay = 15;
 // game state
 let gameState = "menu";
 
+let levelSkipEnabled = true; // enable/disable level skipping
+
 // background image
 const background = new Image();
 
@@ -941,6 +943,28 @@ function loadLevel(levelIndex) {
 
 }
 
+function skipLevel() {
+
+    if (currentLevel < levels.length - 1) {
+        currentLevel++;
+        velocityY = 0;
+        loadLevel(currentLevel);
+        console.log("Skipped to level:", currentLevel + 1);
+    }
+
+}
+
+function previousLevel() {
+
+    if (currentLevel > 0) {
+        currentLevel--;
+        velocityY = 0;
+        loadLevel(currentLevel);
+        console.log("Went back to level:", currentLevel + 1);
+    }
+
+}
+
 //load first level
 loadLevel(currentLevel);
 
@@ -948,6 +972,20 @@ loadLevel(currentLevel);
 window.addEventListener("keydown", function(event) {
     let key = event.key.toLowerCase();
     pressedKeys[key] = true;
+
+    // level skip debug controls
+    if (levelSkipEnabled) {
+
+        if (key === "t") {
+            skipLevel();
+        }
+
+        if (key === "r") {
+            previousLevel();
+        }
+
+    }
+
 });
 
 window.addEventListener("keyup", function(event) {
@@ -3155,7 +3193,7 @@ startButton.addEventListener("click", function() {
 
         }, 2000);
 
-    }, 18000); // 18 second delay
+    }, 1000); // 18 second delay
 
 });
 
