@@ -444,6 +444,10 @@ let smallSpikeFrameIndex = 0;
 let smallSpikeFrameCounter = 0;
 let smallSpikeFrameDelay = 25;
 
+// falling arrows for level 8
+let fallingBossArrows = [];
+let fallingArrowTraps = [];
+
 
 
 
@@ -1012,6 +1016,7 @@ function loadLevel(levelIndex) {
 
     if (levelIndex === 7) {
 
+    //lava traps locations and random index for animation
     lavaTraps = [
 
         { x: 222, y: 670, size: 120, frameOffset: Math.floor(Math.random() * lavaTrapFrames.length) },
@@ -1020,11 +1025,34 @@ function loadLevel(levelIndex) {
         { x: 1530, y: 381, size: 120, frameOffset: Math.floor(Math.random() * lavaTrapFrames.length) }
 
     ];
-    
     } else {
         lavaTraps = [];
     }
 
+    // spawn falling arrows level 8
+    if (levelIndex === 7) {
+
+        fallingBossArrows = [];
+
+        fallingArrowTraps = [
+
+            { x: 537,  y: 216, width: 35, height: 18, speed: 8, playerInRange: false },
+
+            { x: 886,  y: 211, width: 35, height: 18, speed: 8, playerInRange: false },
+
+            { x: 982,  y: 212, width: 35, height: 18, speed: 8, playerInRange: false },
+
+            { x: 1254, y: 220, width: 35, height: 18, speed: 8, playerInRange: false },
+
+            { x: 1348, y: 268, width: 35, height: 18, speed: 8, playerInRange: false }
+
+        ];
+
+    } else {
+        fallingBossArrows = [];
+    }
+
+    //big spike positions and random index for animation
     bigSpikes = [
 
         { x: 575, y: 600, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) },
@@ -1036,7 +1064,7 @@ function loadLevel(levelIndex) {
     bigSpikeFrameIndex = 0;
     bigSpikeFrameCounter = 0;
 
-
+    //small spike positions and random index for animation
     smallSpikes = [
 
         { x: 672, y: 618, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
@@ -2540,6 +2568,109 @@ if (!invincible && currentLevel === 2) {
     }
 }
 
+    // falling boss arrows level 8
+    if (currentLevel === 7) {
+
+        // check traps and spawn arrows
+        for (let trap of fallingArrowTraps) {
+
+            let playerCenterX = player.x + player.size / 2;
+            let trapCenterX = trap.x + trap.width / 2;
+
+            let triggerDistance = 35;
+
+            let inRange = Math.abs(playerCenterX - trapCenterX) <= triggerDistance;
+
+            // player entered trigger
+            if (inRange && !trap.playerInRange) {
+
+                fallingBossArrows.push({
+                    x: trap.x,
+                    y: trap.y,
+                    width: trap.width,
+                    height: trap.height,
+                    speed: trap.speed,
+                    shooting: true,
+                    playerInRange: false
+                });
+
+            }
+
+            trap.playerInRange = inRange;
+        }
+
+        for (let i = 0; i < fallingBossArrows.length; i++) {
+
+            let arrow = fallingBossArrows[i];
+
+            if (!arrow) continue;
+
+            // player centre
+            let playerCenterX = player.x + player.size / 2;
+
+            let arrowCenterX = arrow.x + arrow.width / 2;
+
+            // trigger distance from arrow 
+            let triggerDistance = 35;
+
+            let inRange = Math.abs(playerCenterX - arrowCenterX) <= triggerDistance;
+
+            // player entered the range
+            if (inRange && !arrow.playerInRange) {
+                arrow.shooting = true;
+            }
+
+            // update range state 
+            arrow.playerInRange = inRange;
+
+            // move arrow only after triggered
+            if (arrow.shooting) {
+                arrow.y += arrow.speed * deltaTime;
+            }
+
+            // smaller hitbox
+            const arrowHitbox = {
+                x: arrow.x + 12,
+                y: arrow.y + 4,
+                width: arrow.width - 24,
+                height: arrow.height - 8
+            };
+
+            // hit player
+            if (isColliding(player, arrowHitbox)) {
+
+                playerHitSound.currentTime = 0;
+                playerHitSound.play();
+
+                // reset arrow
+                arrow.y = 216;
+                arrow.shooting = false;
+                arrow.playerInRange = false;
+
+                // respawn player
+                player.x = 291;
+                player.y = 565;
+                velocityY = 0;
+            }
+
+            // hit wall reset arrow
+            for (let wall of walls) {
+
+                if (arrow && isColliding(arrowHitbox, wall)) {
+
+                    arrow.y = 216;
+                    arrow.shooting = false;
+                    arrow.playerInRange = false;
+
+                    break;
+                }
+
+            }
+
+        }
+
+    }
+
 }
 
 
@@ -3141,6 +3272,74 @@ if (debugMode && currentDrag) {
                 spike.size,
                 spike.size
             );
+
+        }
+
+    }
+
+    // draw boss arrow
+    if (bossArrow) {
+
+        ctx.save();
+        ctx.translate(bossArrow.x + bossArrow.width / 2, bossArrow.y + bossArrow.height / 2);
+
+        if (bossArrow.direction === "left") ctx.rotate(Math.PI);
+        else if (bossArrow.direction === "up") ctx.rotate(-Math.PI/2);
+        else if (bossArrow.direction === "down") ctx.rotate(Math.PI/2);
+
+        ctx.drawImage(
+            bossArrowSprite,
+            -bossArrow.width / 2,
+            -bossArrow.height / 2,
+            bossArrow.width,
+            bossArrow.height
+        );
+
+        ctx.restore();
+    }
+
+
+    // draw falling arrows level 8
+    if (currentLevel === 7) {
+
+        for (let arrow of fallingBossArrows) {
+
+            if (!arrow) continue;
+            if (!arrow.shooting) continue;
+
+            ctx.save();
+
+            ctx.translate(
+                arrow.x + arrow.width / 2,
+                arrow.y + arrow.height / 2
+            );
+
+            // rotate arrow so it faces down
+            ctx.rotate(Math.PI / 2);
+
+            ctx.drawImage(
+                bossArrowSprite,
+                -arrow.width / 2,
+                -arrow.height / 2,
+                arrow.width,
+                arrow.height
+            );
+
+            ctx.restore();
+
+            // debug hitbox
+            if (debugMode) {
+
+                ctx.strokeStyle = "yellow";
+
+                ctx.strokeRect(
+                    arrow.x + 12,
+                    arrow.y + 8,
+                    arrow.width - 24,
+                    arrow.height - 16
+                );
+
+            }
 
         }
 
