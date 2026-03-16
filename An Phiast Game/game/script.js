@@ -740,6 +740,11 @@ function loadLevel(levelIndex) {
     player.x = 928;
     player.y = 605;
     }
+    else if (levelIndex === 7) {
+    // level 8
+    player.x = 291;
+    player.y = 565;
+    }
     else {
     //first three levels so far
     player.x = 291;
