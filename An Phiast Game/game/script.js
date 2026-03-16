@@ -448,6 +448,21 @@ let smallSpikeFrameDelay = 25;
 let fallingBossArrows = [];
 let fallingArrowTraps = [];
 
+// red bat animation frames lvl 8
+const redBatFrames = [];
+
+for (let i = 1; i <= 6; i++) {
+    const img = new Image();
+    img.src = "assets/images/redbat_" + i + ".png";
+    redBatFrames.push(img);
+}
+
+let redBat = null;
+
+let redBatFrameIndex = 0;
+let redBatFrameCounter = 0;
+let redBatFrameDelay = 8;
+
 
 
 
@@ -1048,16 +1063,34 @@ function loadLevel(levelIndex) {
 
         ];
 
-    } else {
-        fallingBossArrows = [];
-    }
+        // spawn red bat
+            redBat = {
+                x: 499,
+                y: 330,
+                startX: 499,
+                endX: 1406,
+                size: 110,
+                speed: 4,
+                direction: "right"
+            };
+
+            redBatFrameIndex = 0;
+            redBatFrameCounter = 0;
+
+        } else {
+
+            fallingBossArrows = [];
+            redBat = null;
+
+        }
 
     //big spike positions and random index for animation
     bigSpikes = [
 
         { x: 575, y: 600, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) },
         { x: 960, y: 366, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) },
-        { x: 1599, y: 522, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) }
+        { x: 1599, y: 522, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) },
+        { x: 530, y: 762, size: 100, frameOffset: Math.floor(Math.random() * bigSpikeFrames.length) }
 
     ];
 
@@ -1069,7 +1102,11 @@ function loadLevel(levelIndex) {
 
         { x: 672, y: 618, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
         { x: 895, y: 370, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
-        { x: 1050, y: 370, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) }
+        { x: 1050, y: 370, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
+        { x: 602, y: 742, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
+        { x: 656, y: 804, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
+        { x: 1265, y: 580, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) },
+        { x: 1332, y: 595, size: 70, frameOffset: Math.floor(Math.random() * smallSpikeFrames.length) }
 
     ];
 
@@ -2671,7 +2708,42 @@ if (!invincible && currentLevel === 2) {
 
     }
 
+
+
+    // red bat movement level 8
+    if (redBat && currentLevel === 7) {
+
+        if (redBat.direction === "right") {
+            redBat.x += redBat.speed * deltaTime;
+        } else {
+            redBat.x -= redBat.speed * deltaTime;
+        }
+
+        // turn around
+        if (redBat.x >= redBat.endX) {
+            redBat.direction = "left";
+        }
+
+        if (redBat.x <= redBat.startX) {
+            redBat.direction = "right";
+        }
+
+        // animation
+        redBatFrameCounter++;
+
+        if (redBatFrameCounter >= redBatFrameDelay) {
+            redBatFrameCounter = 0;
+            redBatFrameIndex++;
+
+            if (redBatFrameIndex >= redBatFrames.length) {
+                redBatFrameIndex = 0;
+            }
+        }
+    }
+
 }
+
+    
 
 
 let isDragging = false;
@@ -3343,6 +3415,39 @@ if (debugMode && currentDrag) {
 
         }
 
+    }
+
+        // draw red bat level 8
+    if (
+        redBat &&
+        redBatFrames[redBatFrameIndex] &&
+        redBatFrames[redBatFrameIndex].complete
+    ) {
+
+        ctx.save();
+
+        if (redBat.direction === "left") {
+            ctx.translate(redBat.x + redBat.size, redBat.y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(
+                redBatFrames[redBatFrameIndex],
+                0,
+                0,
+                redBat.size,
+                redBat.size
+            );
+        } else {
+            ctx.drawImage(
+                redBatFrames[redBatFrameIndex],
+                redBat.x,
+                redBat.y,
+                redBat.size,
+                redBat.size
+            );
+        }
+
+        ctx.restore();
     }
  
 
