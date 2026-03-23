@@ -2848,6 +2848,35 @@ if (!invincible && currentLevel === 2) {
         }
     }
 
+    // red bat collision level 8
+    if (redBat && currentLevel === 7) {
+
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        const batHitbox = {
+            x: redBat.x + 20,
+            y: redBat.y + 20,
+            size: redBat.size - 40
+        };
+
+        if (isColliding(playerHitbox, batHitbox)) {
+
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
+            // respawn player
+            player.x = 291;
+            player.y = 565;
+            velocityY = 0;
+
+            return; 
+        }
+    }
+
 }
 
     
