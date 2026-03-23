@@ -1343,6 +1343,39 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
     }
 
+    // lava trap damage level 8
+    if (currentLevel === 7) {
+
+        for (let trap of lavaTraps) {
+
+            let frameIndex =
+                (lavaTrapFrameIndex + trap.frameOffset) % lavaTrapFrames.length;
+
+               //smaller hitbox when trap is fully open
+            if (frameIndex >= 3 && frameIndex <= 7) {
+
+                const trapHitbox = {
+                    x: trap.x + 20,
+                    y: trap.y + 20,
+                    size: trap.size - 40
+                };
+
+                if (isColliding(player, trapHitbox)) {
+
+                    playerHitSound.currentTime = 0;
+                    playerHitSound.play();
+
+                    // reset player
+                    player.x = 291;
+                    player.y = 565;
+                    velocityY = 0;
+
+                    return; // stop checking traps
+                }
+            }
+        }
+    }
+
 
 
     // collision with walls for level 4
@@ -2749,7 +2782,7 @@ if (!invincible && currentLevel === 2) {
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
 let currentDrag = null; 
-let debugMode = true;
+let debugMode = false;
 
 canvas.addEventListener("mousedown", (e) => {
     if (gameState !== "playing") return;
@@ -2906,18 +2939,22 @@ function draw() {
 
     if (debugMode) {
     ctx.save();
-    ctx.strokeStyle = "red";  // outline color
-    ctx.lineWidth = 2;             // thickness
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 2;
 
     for (let wall of walls) {
-            const w = wall.width ?? wall.size;
-            const h = wall.height ?? wall.size;
 
-            ctx.strokeRect(wall.x, wall.y, w, h);
-        }
-        ctx.restore();
-    }   
+        let w = wall.width;
+        let h = wall.height;
 
+        if (w === undefined) w = wall.size;
+        if (h === undefined) h = wall.size;
+
+        ctx.strokeRect(wall.x, wall.y, w, h);
+    }
+
+    ctx.restore();
+}
 
 // show live dragging wall
 if (debugMode && currentDrag) {
@@ -3450,6 +3487,27 @@ if (debugMode && currentDrag) {
         ctx.restore();
     }
  
+    //hitbox for lava traps level 8
+    if (debugMode && currentLevel === 7) {
+
+    ctx.save();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "yellow";
+
+    for (let trap of lavaTraps) {
+
+        let padding = 20;
+
+        ctx.strokeRect(
+            trap.x + padding,
+            trap.y + padding,
+            trap.size - padding * 2,
+            trap.size - padding * 2
+        );
+    }
+
+        ctx.restore();
+    }
 
     // draw player sprite
     const sprite = sprites[player.direction];
