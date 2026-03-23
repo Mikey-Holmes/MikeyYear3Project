@@ -201,7 +201,7 @@ let bossScore = 0; // level 7 score
 let health = 3; // player health
 let invincible = false;
 
-let showEnding = true; //end screen
+let showEnding = false; //end screen
 
 // animated lava for level 4
 const lavaFrames = [];
@@ -694,6 +694,37 @@ const levels = [
 
         ],
         key: {},
+        exitWall: {x: 1721, y: 292, width: 2, height: 502}
+    },
+
+    {
+    backgroundSrc: "assets/images/background_9.png",//background lvl 9
+        walls: [
+            {x: 195, y: 327, width: 3, height: 409},
+            {x: 207, y: 325, width: 260, height: 4},
+            {x: 466, y: 229, width: 1, height: 95},
+            {x: 464, y: 224, width: 98, height: 8},
+            {x: 561, y: 142, width: 1, height: 81},
+            {x: 561, y: 131, width: 791, height: 11},
+            {x: 1360, y: 141, width: 3, height: 88},
+            {x: 1359, y: 229, width: 95, height: 5},
+            {x: 1454, y: 234, width: 4, height: 92},
+            {x: 1453, y: 325, width: 274, height: 4},
+            {x: 1723, y: 330, width: 3, height: 430},
+             {x: 1456, y: 750, width: 264, height: 3},
+             {x: 1452, y: 750, width: 2, height: 90},
+             {x: 1358, y: 842, width: 90, height: 6},
+             {x: 1356, y: 850, width: 2, height: 91},
+             {x: 567, y: 935, width: 787, height: 4},
+             {x: 561, y: 845, width: 5, height: 89},
+             {x: 476, y: 840, width: 89, height: 1},
+             {x: 466, y: 750, width: 2, height: 94},
+             {x: 189, y: 747, width: 279, height: 1}
+
+            
+
+        ],
+        key: {},
         exitWall: {}
     }
 ];
@@ -763,6 +794,11 @@ function loadLevel(levelIndex) {
     // level 8
     player.x = 291;
     player.y = 565;
+    }
+    else if (levelIndex === 8) {
+    // level 9
+    player.x = 236;
+    player.y = 540;
     }
     else {
     //first three levels so far
@@ -2035,13 +2071,12 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             trophy.spawned = false;
 
-            // play level up sound
             levelCompleteSound.currentTime = 0;
             levelCompleteSound.play();
 
-            if (showEnding) {
-                endGameSplashes();
-            }
+            // go to next level
+            currentLevel++;
+            loadLevel(currentLevel);
         }
     }
 
@@ -2631,7 +2666,10 @@ if (!invincible && currentLevel === 2) {
             (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) ||
 
             // level 7 needs boss score
-            (currentLevel === 6 && bossScore >= 150)
+            (currentLevel === 6 && bossScore >= 150) ||
+
+            //level 8
+            (currentLevel === 7)
         )
     ) 
     {
