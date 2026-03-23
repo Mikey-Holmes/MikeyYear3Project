@@ -463,6 +463,8 @@ let redBatFrameIndex = 0;
 let redBatFrameCounter = 0;
 let redBatFrameDelay = 8;
 
+let level9Spider = null;
+
 
 
 
@@ -711,18 +713,15 @@ const levels = [
             {x: 1454, y: 234, width: 4, height: 92},
             {x: 1453, y: 325, width: 274, height: 4},
             {x: 1723, y: 330, width: 3, height: 430},
-             {x: 1456, y: 750, width: 264, height: 3},
-             {x: 1452, y: 750, width: 2, height: 90},
-             {x: 1358, y: 842, width: 90, height: 6},
-             {x: 1356, y: 850, width: 2, height: 91},
-             {x: 567, y: 935, width: 787, height: 4},
-             {x: 561, y: 845, width: 5, height: 89},
-             {x: 476, y: 840, width: 89, height: 1},
-             {x: 466, y: 750, width: 2, height: 94},
-             {x: 189, y: 747, width: 279, height: 1}
-
-            
-
+            {x: 1456, y: 750, width: 264, height: 3},
+            {x: 1452, y: 750, width: 2, height: 90},
+            {x: 1358, y: 842, width: 90, height: 6},
+            {x: 1356, y: 850, width: 2, height: 91},
+            {x: 567, y: 935, width: 787, height: 4},
+            {x: 561, y: 845, width: 5, height: 89},
+            {x: 476, y: 840, width: 89, height: 1},
+            {x: 466, y: 750, width: 2, height: 94},
+            {x: 189, y: 747, width: 279, height: 1}
         ],
         key: {},
         exitWall: {}
@@ -1148,8 +1147,27 @@ function loadLevel(levelIndex) {
 
     smallSpikeFrameIndex = 0;
     smallSpikeFrameCounter = 0;
-        
+    
+    //temporary spider enemy
+    if (levelIndex === 8) {
+        level9Spider = {
+            x: 410,
+            y: 322,
+            size: 100,
+            speed: 2,
+            startY: 322,
+            endY: 672,
 
+            //animation
+            frameX: 0,
+            maxFrame: 7,
+            frameCounter: 0,
+            frameDelay: 10,
+            direction: "down" 
+        };
+    } else {
+        level9Spider = null;
+    }
 }
 
 function skipLevel() {
@@ -1487,6 +1505,29 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     }
 
 
+    // level 9 spider movement
+    if (currentLevel === 8 && level9Spider) {
+
+        level9Spider.y += level9Spider.speed * deltaTime;
+
+        // reached end reset to top
+        if (level9Spider.y >= level9Spider.endY) {
+            level9Spider.y = level9Spider.startY;
+        }
+    }
+
+        if (currentLevel === 8 && level9Spider) {
+
+        // movement
+        level9Spider.y += level9Spider.speed * deltaTime;
+
+        if (level9Spider.y >= level9Spider.endY) {
+            level9Spider.y = level9Spider.startY;
+        }
+
+        // animation
+        animateEnemy(level9Spider);
+    }
 
     // collision with walls for level 4
 if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
@@ -3696,6 +3737,24 @@ if (debugMode && currentDrag) {
         }
 
         ctx.restore();
+    }
+
+    if (currentLevel === 8 && level9Spider) {
+
+        const frameWidth = enemy1Sprite.width / (level9Spider.maxFrame + 1);
+        const frameHeight = enemy1Sprite.height;
+
+        ctx.drawImage(
+            enemy1Sprite,
+            level9Spider.frameX * frameWidth,
+            0,
+            frameWidth,
+            frameHeight,
+            level9Spider.x,
+            level9Spider.y,
+            level9Spider.size,
+            level9Spider.size
+        );
     }
 
     // draw player sprite
