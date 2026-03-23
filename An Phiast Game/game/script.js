@@ -1376,6 +1376,43 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+    // big spike damage level 8
+    if (currentLevel === 7) {
+
+        for (let spike of bigSpikes) {
+
+            let frameIndex =
+                (bigSpikeFrameIndex + spike.frameOffset) % bigSpikeFrames.length;
+
+            //damage frames
+            if (frameIndex >= 3 && frameIndex <= 5) {
+
+                let paddingX = 30;
+                let paddingY = 10;
+
+                let spikeHitbox = {
+                    x: spike.x + paddingX,
+                    y: spike.y + paddingY,
+                    width: spike.size - paddingX * 2,
+                    height: spike.size - paddingY * 2
+                };
+
+                if (isColliding(player, spikeHitbox)) {
+
+                    playerHitSound.currentTime = 0;
+                    playerHitSound.play();
+
+                    //respawn player
+                    player.x = 291;
+                    player.y = 565;
+                    velocityY = 0;
+
+                    return;
+                }
+            }
+        }
+    }
+
 
 
     // collision with walls for level 4
@@ -2782,7 +2819,7 @@ if (!invincible && currentLevel === 2) {
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
 let currentDrag = null; 
-let debugMode = false;
+let debugMode = true;
 
 canvas.addEventListener("mousedown", (e) => {
     if (gameState !== "playing") return;
@@ -3503,6 +3540,29 @@ if (debugMode && currentDrag) {
             trap.y + padding,
             trap.size - padding * 2,
             trap.size - padding * 2
+        );
+    }
+
+        ctx.restore();
+    }
+
+    //hitbox for big spikes level 8
+    if (debugMode && currentLevel === 7) {
+
+    ctx.save();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "cyan";
+
+    for (let spike of bigSpikes) {
+
+        let paddingX = 30;
+        let paddingY = 10;
+
+        ctx.strokeRect(
+            spike.x + paddingX,
+            spike.y + paddingY,
+            spike.size - paddingX * 2,
+            spike.size - paddingY * 2
         );
     }
 
