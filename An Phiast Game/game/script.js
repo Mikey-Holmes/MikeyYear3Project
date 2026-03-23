@@ -1388,13 +1388,14 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             if (frameIndex >= 3 && frameIndex <= 5) {
 
                 let paddingX = 30;
-                let paddingY = 10;
+                let paddingTop = 25;
+                let paddingBottom = 10;
 
                 let spikeHitbox = {
                     x: spike.x + paddingX,
-                    y: spike.y + paddingY,
+                    y: spike.y + paddingTop,
                     width: spike.size - paddingX * 2,
-                    height: spike.size - paddingY * 2
+                    height: spike.size - paddingTop - paddingBottom
                 };
 
                 if (isColliding(player, spikeHitbox)) {
@@ -1403,6 +1404,42 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                     playerHitSound.play();
 
                     //respawn player
+                    player.x = 291;
+                    player.y = 565;
+                    velocityY = 0;
+
+                    return;
+                }
+            }
+        }
+    }
+
+    // small spike damage level 8
+    if (currentLevel === 7) {
+
+        for (let spike of smallSpikes) {
+
+            let frameIndex =
+                (smallSpikeFrameIndex + spike.frameOffset) % smallSpikeFrames.length;
+
+            if (frameIndex >= 3 && frameIndex <= 5) {
+
+                let paddingX = 25;
+                let paddingTop = 20;
+                let paddingBottom = 12;
+
+                let spikeHitbox = {
+                    x: spike.x + paddingX,
+                    y: spike.y + paddingTop,
+                    width: spike.size - paddingX * 2,
+                    height: spike.size - paddingTop - paddingBottom
+                };
+
+                if (isColliding(player, spikeHitbox)) {
+
+                    playerHitSound.currentTime = 0;
+                    playerHitSound.play();
+
                     player.x = 291;
                     player.y = 565;
                     velocityY = 0;
@@ -3556,15 +3593,40 @@ if (debugMode && currentDrag) {
     for (let spike of bigSpikes) {
 
         let paddingX = 30;
-        let paddingY = 10;
+        let paddingTop = 25;
+        let paddingBottom = 10;
 
         ctx.strokeRect(
             spike.x + paddingX,
-            spike.y + paddingY,
+            spike.y + paddingTop,
             spike.size - paddingX * 2,
-            spike.size - paddingY * 2
+            spike.size - paddingTop - paddingBottom
         );
     }
+
+        ctx.restore();
+    }
+
+    //hitbox for small spikes level 8
+        if (debugMode && currentLevel === 7) {
+
+        ctx.save();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "lime";
+
+        for (let spike of smallSpikes) {
+
+            let paddingX = 25;
+            let paddingTop = 20;
+            let paddingBottom = 12;
+
+            ctx.strokeRect(
+            spike.x + paddingX,
+            spike.y + paddingTop,
+            spike.size - paddingX * 2,
+            spike.size - paddingTop - paddingBottom
+        );
+        }
 
         ctx.restore();
     }
