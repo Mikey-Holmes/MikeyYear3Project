@@ -463,6 +463,18 @@ let redBatFrameIndex = 0;
 let redBatFrameCounter = 0;
 let redBatFrameDelay = 8;
 
+// level 9 blue spider
+const blueSpiderFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/bluespider_" + i + ".png";
+    blueSpiderFrames.push(img);
+}
+
+let blueSpiderFrameIndex = 0;
+let blueSpiderFrameCounter = 0;
+let blueSpiderFrameDelay = 10;
 let level9Spider = null;
 
 
@@ -1154,20 +1166,13 @@ function loadLevel(levelIndex) {
             x: 410,
             y: 322,
             size: 100,
-            speed: 2,
+            speed: Math.random() * 4 + 3,
             startY: 322,
             endY: 672,
-
-            //animation
-            frameX: 0,
-            maxFrame: 7,
-            frameCounter: 0,
-            frameDelay: 10,
-            direction: "down" 
         };
-    } else {
-        level9Spider = null;
-    }
+        } else {
+            level9Spider = null;
+        }
 }
 
 function skipLevel() {
@@ -1523,10 +1528,54 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
         if (level9Spider.y >= level9Spider.endY) {
             level9Spider.y = level9Spider.startY;
+
+            level9Spider.speed = Math.random() * 4 + 3;
         }
 
-        // animation
-        animateEnemy(level9Spider);
+        // animate blue spider
+        if (currentLevel === 8 && level9Spider) {
+
+            blueSpiderFrameCounter++;
+
+            if (blueSpiderFrameCounter >= blueSpiderFrameDelay) {
+                blueSpiderFrameCounter = 0;
+                blueSpiderFrameIndex++;
+
+                if (blueSpiderFrameIndex >= blueSpiderFrames.length) {
+                    blueSpiderFrameIndex = 0;
+                }
+            }
+        }
+
+        // level 9 spider collision
+        if (currentLevel === 8 && level9Spider) {
+
+            const playerHitbox = {
+                x: player.x + 15,
+                y: player.y + 15,
+                size: player.size - 30
+            };
+
+            const spiderHitbox = {
+                x: level9Spider.x + 20,
+                y: level9Spider.y + 20,
+                size: level9Spider.size - 40
+            };
+
+            if (isColliding(playerHitbox, spiderHitbox)) {
+
+                // play hit sound
+                playerHitSound.currentTime = 0;
+                playerHitSound.play();
+
+                // respawn player
+                player.x = 236;
+                player.y = 540;
+                velocityY = 0;
+
+                return;
+            }
+        }
     }
 
     // collision with walls for level 4
@@ -3739,17 +3788,15 @@ if (debugMode && currentDrag) {
         ctx.restore();
     }
 
-    if (currentLevel === 8 && level9Spider) {
-
-        const frameWidth = enemy1Sprite.width / (level9Spider.maxFrame + 1);
-        const frameHeight = enemy1Sprite.height;
+    if (
+        currentLevel === 8 &&
+        level9Spider &&
+        blueSpiderFrames[blueSpiderFrameIndex] &&
+        blueSpiderFrames[blueSpiderFrameIndex].complete
+    ) {
 
         ctx.drawImage(
-            enemy1Sprite,
-            level9Spider.frameX * frameWidth,
-            0,
-            frameWidth,
-            frameHeight,
+            blueSpiderFrames[blueSpiderFrameIndex],
             level9Spider.x,
             level9Spider.y,
             level9Spider.size,
