@@ -477,6 +477,19 @@ let blueSpiderFrameCounter = 0;
 let blueSpiderFrameDelay = 10;
 let level9Spider = null;
 
+// level 9 bat one 
+const batOneLvl9Frames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/batOneLvl9_" + i + ".png";
+    batOneLvl9Frames.push(img);
+}
+
+let batOneLvl9FrameIndex = 0;
+let batOneLvl9FrameCounter = 0;
+let batOneLvl9FrameDelay = 10;
+let batOneLvl9 = null;
 
 
 
@@ -1160,19 +1173,31 @@ function loadLevel(levelIndex) {
     smallSpikeFrameIndex = 0;
     smallSpikeFrameCounter = 0;
     
-    //temporary spider enemy
+    // level 9 spider load
     if (levelIndex === 8) {
         level9Spider = {
             x: 410,
             y: 322,
             size: 100,
-            speed: Math.random() * 4 + 3,
+            speed: Math.floor(Math.random() * 4) + 3, 
             startY: 322,
             endY: 672,
         };
+
+
+        batOneLvl9 = {
+            x: 772,
+            y: 154,
+            size: 100,
+            speed: Math.floor(Math.random() * 4) + 7,
+            startY: 154,
+            endY: 865
+        };
         } else {
             level9Spider = null;
+            batOneLvl9 = null;
         }
+
 }
 
 function skipLevel() {
@@ -1529,7 +1554,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         if (level9Spider.y >= level9Spider.endY) {
             level9Spider.y = level9Spider.startY;
 
-            level9Spider.speed = Math.random() * 4 + 3;
+            level9Spider.speed = Math.floor(Math.random() * 4) + 3;
         }
 
         // animate blue spider
@@ -1550,12 +1575,14 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         // level 9 spider collision
         if (currentLevel === 8 && level9Spider) {
 
+            // smaller hitbox for player
             const playerHitbox = {
                 x: player.x + 15,
                 y: player.y + 15,
                 size: player.size - 30
             };
 
+            // smaller hitbox for spider
             const spiderHitbox = {
                 x: level9Spider.x + 20,
                 y: level9Spider.y + 20,
@@ -1575,6 +1602,62 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
                 return;
             }
+        }
+    }
+
+    // level 9 bat movement
+    if (currentLevel === 8 && batOneLvl9) {
+
+        batOneLvl9.y += batOneLvl9.speed * deltaTime;
+
+        if (batOneLvl9.y >= batOneLvl9.endY) {
+            batOneLvl9.y = batOneLvl9.startY;
+
+            // random speed each cycle
+            batOneLvl9.speed = Math.floor(Math.random() * 4) + 7;
+        }
+    }
+
+    // animate level 9 bat
+    if (currentLevel === 8 && batOneLvl9) {
+
+        batOneLvl9FrameCounter++;
+
+        if (batOneLvl9FrameCounter >= batOneLvl9FrameDelay) {
+            batOneLvl9FrameCounter = 0;
+            batOneLvl9FrameIndex++;
+
+            if (batOneLvl9FrameIndex >= batOneLvl9Frames.length) {
+                batOneLvl9FrameIndex = 0;
+            }
+        }
+    }
+
+    // level 9 bat collision
+    if (currentLevel === 8 && batOneLvl9) {
+
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        const batHitbox = {
+            x: batOneLvl9.x + 20,
+            y: batOneLvl9.y + 20,
+            size: batOneLvl9.size - 40
+        };
+
+        if (isColliding(playerHitbox, batHitbox)) {
+
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
+            player.x = 236;
+            player.y = 540;
+            velocityY = 0;
+
+            return;
         }
     }
 
@@ -3801,6 +3884,21 @@ if (debugMode && currentDrag) {
             level9Spider.y,
             level9Spider.size,
             level9Spider.size
+        );
+    }
+
+    if (
+        currentLevel === 8 &&
+        batOneLvl9 &&
+        batOneLvl9Frames[batOneLvl9FrameIndex] &&
+        batOneLvl9Frames[batOneLvl9FrameIndex].complete
+    ) {
+        ctx.drawImage(
+            batOneLvl9Frames[batOneLvl9FrameIndex],
+            batOneLvl9.x,
+            batOneLvl9.y,
+            batOneLvl9.size,
+            batOneLvl9.size
         );
     }
 
