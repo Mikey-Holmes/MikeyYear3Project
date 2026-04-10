@@ -505,6 +505,21 @@ let greenSpiderFrameCounter = 0;
 let greenSpiderFrameDelay = 10;
 let greenSpiderLvl9 = null;
 
+// level 9 green bat animation
+const greenBatFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/greenbat_" + i + ".png";
+    greenBatFrames.push(img);
+}
+
+let greenBatFrameIndex = 0;
+let greenBatFrameCounter = 0;
+let greenBatFrameDelay = 10;
+
+let greenBatLvl9 = null;
+
 
 
 
@@ -1188,7 +1203,7 @@ function loadLevel(levelIndex) {
     smallSpikeFrameIndex = 0;
     smallSpikeFrameCounter = 0;
     
-    // level 9 spider load
+    // level 9 enemies load
     if (levelIndex === 8) {
         level9Spider = {
             x: 410,
@@ -1218,12 +1233,22 @@ function loadLevel(levelIndex) {
             endY: 865
         };
 
+        greenBatLvl9 = {
+        x: 1200,
+        y: 154,
+        size: 100,
+        speed: Math.floor(Math.random() * 5) + 8,
+        startY: 154,
+        endY: 865
+    };
+
         }
 
         else {
             level9Spider = null;
             batOneLvl9 = null;
             greenSpiderLvl9 = null;
+            greenBatLvl9 = null;
         }
 
 }
@@ -1735,6 +1760,62 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         };
 
         if (isColliding(playerHitbox, spiderHitbox)) {
+
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
+            player.x = 236;
+            player.y = 540;
+            velocityY = 0;
+
+            return;
+        }
+    }
+
+    // level 9 green bat movement
+    if (currentLevel === 8 && greenBatLvl9) {
+
+        greenBatLvl9.y += greenBatLvl9.speed * deltaTime;
+
+        if (greenBatLvl9.y >= greenBatLvl9.endY) {
+            greenBatLvl9.y = greenBatLvl9.startY;
+
+            // random speed
+            greenBatLvl9.speed = Math.floor(Math.random() * 5) + 8;
+        }
+    }
+
+    // animate green bat
+    if (currentLevel === 8 && greenBatLvl9) {
+
+        greenBatFrameCounter++;
+
+        if (greenBatFrameCounter >= greenBatFrameDelay) {
+            greenBatFrameCounter = 0;
+            greenBatFrameIndex++;
+
+            if (greenBatFrameIndex >= greenBatFrames.length) {
+                greenBatFrameIndex = 0;
+            }
+        }
+    }
+
+    // level 9 green bat collision
+    if (currentLevel === 8 && greenBatLvl9) {
+
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        const batHitbox = {
+            x: greenBatLvl9.x + 20,
+            y: greenBatLvl9.y + 20,
+            size: greenBatLvl9.size - 40
+        };
+
+        if (isColliding(playerHitbox, batHitbox)) {
 
             playerHitSound.currentTime = 0;
             playerHitSound.play();
@@ -4000,6 +4081,21 @@ if (debugMode && currentDrag) {
             greenSpiderLvl9.y,
             greenSpiderLvl9.size,
             greenSpiderLvl9.size
+        );
+    }
+
+    if (
+        currentLevel === 8 &&
+        greenBatLvl9 &&
+        greenBatFrames[greenBatFrameIndex] &&
+        greenBatFrames[greenBatFrameIndex].complete
+    ) {
+        ctx.drawImage(
+            greenBatFrames[greenBatFrameIndex],
+            greenBatLvl9.x,
+            greenBatLvl9.y,
+            greenBatLvl9.size,
+            greenBatLvl9.size
         );
     }
 
