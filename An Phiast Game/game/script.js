@@ -491,6 +491,21 @@ let batOneLvl9FrameCounter = 0;
 let batOneLvl9FrameDelay = 10;
 let batOneLvl9 = null;
 
+// level 9 green spider
+const greenSpiderFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/greenspider_" + i + ".png";
+    greenSpiderFrames.push(img);
+}
+
+let greenSpiderFrameIndex = 0;
+let greenSpiderFrameCounter = 0;
+let greenSpiderFrameDelay = 10;
+let greenSpiderLvl9 = null;
+
+
 
 
 // levels definition
@@ -1186,16 +1201,29 @@ function loadLevel(levelIndex) {
 
 
         batOneLvl9 = {
-            x: 772,
+            x: 702,
             y: 154,
             size: 100,
-            speed: Math.floor(Math.random() * 4) + 7,
+            speed: Math.floor(Math.random() * 6) + 9,
             startY: 154,
             endY: 865
         };
-        } else {
+
+        greenSpiderLvl9 = {
+            x: 952, 
+            y: 154,  
+            size: 100,
+            speed: Math.floor(Math.random() * 5) + 9,
+            startY: 154,
+            endY: 865
+        };
+
+        }
+
+        else {
             level9Spider = null;
             batOneLvl9 = null;
+            greenSpiderLvl9 = null;
         }
 
 }
@@ -1614,7 +1642,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             batOneLvl9.y = batOneLvl9.startY;
 
             // random speed each cycle
-            batOneLvl9.speed = Math.floor(Math.random() * 4) + 7;
+            batOneLvl9.speed = Math.floor(Math.random() * 6) + 9;
         }
     }
 
@@ -1649,6 +1677,64 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         };
 
         if (isColliding(playerHitbox, batHitbox)) {
+
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
+            player.x = 236;
+            player.y = 540;
+            velocityY = 0;
+
+            return;
+        }
+    }
+
+    // level 9 green spider movement
+    if (currentLevel === 8 && greenSpiderLvl9) {
+
+        greenSpiderLvl9.y += greenSpiderLvl9.speed * deltaTime;
+
+        if (greenSpiderLvl9.y >= greenSpiderLvl9.endY) {
+            greenSpiderLvl9.y = greenSpiderLvl9.startY;
+
+            // random speed
+            greenSpiderLvl9.speed = Math.floor(Math.random() * 5) + 9;
+        }
+    }
+
+    // animate green spider
+    if (currentLevel === 8 && greenSpiderLvl9) {
+
+        greenSpiderFrameCounter++;
+
+        if (greenSpiderFrameCounter >= greenSpiderFrameDelay) {
+            greenSpiderFrameCounter = 0;
+            greenSpiderFrameIndex++;
+
+            if (greenSpiderFrameIndex >= greenSpiderFrames.length) {
+                greenSpiderFrameIndex = 0;
+            }
+        }
+    }
+
+    // level 9 green spider collision
+    if (currentLevel === 8 && greenSpiderLvl9) {
+
+        // smaller hitbox for player
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        // smaller hitbox for spider
+        const spiderHitbox = {
+            x: greenSpiderLvl9.x + 20,
+            y: greenSpiderLvl9.y + 20,
+            size: greenSpiderLvl9.size - 40
+        };
+
+        if (isColliding(playerHitbox, spiderHitbox)) {
 
             playerHitSound.currentTime = 0;
             playerHitSound.play();
@@ -3899,6 +3985,21 @@ if (debugMode && currentDrag) {
             batOneLvl9.y,
             batOneLvl9.size,
             batOneLvl9.size
+        );
+    }
+
+    if (
+        currentLevel === 8 &&
+        greenSpiderLvl9 &&
+        greenSpiderFrames[greenSpiderFrameIndex] &&
+        greenSpiderFrames[greenSpiderFrameIndex].complete
+    ) {
+        ctx.drawImage(
+            greenSpiderFrames[greenSpiderFrameIndex],
+            greenSpiderLvl9.x,
+            greenSpiderLvl9.y,
+            greenSpiderLvl9.size,
+            greenSpiderLvl9.size
         );
     }
 
