@@ -157,7 +157,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 10.0, // 6 is default, adjusted for testing
+    speed: 6.0, // 6 is default, adjusted for testing
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -517,8 +517,21 @@ for (let i = 1; i <= 4; i++) {
 let greenBatFrameIndex = 0;
 let greenBatFrameCounter = 0;
 let greenBatFrameDelay = 10;
-
 let greenBatLvl9 = null;
+
+// level 9 purple spider
+const purpleSpiderFrames = [];
+
+for (let i = 1; i <= 8; i++) {
+    const img = new Image();
+    img.src = "assets/images/purplespider_" + i + ".png";
+    purpleSpiderFrames.push(img);
+}
+
+let purpleSpiderFrameIndex = 0;
+let purpleSpiderFrameCounter = 0;
+let purpleSpiderFrameDelay = 10;
+let purpleSpiderLvl9 = null;
 
 
 
@@ -801,7 +814,11 @@ function updateHintText() {
     } else if (currentLevel === 5) {
         hintBox.textContent = "Ah moving platforms! Time your jumps carefully and watch out for the dragon attacks!";
     } else if (currentLevel === 6) {
-        hintBox.textContent = "Final level! Beware of the green boss and his attacks, keep your distance, shoot the boss and defeat him to escape the cave!";
+        hintBox.textContent = "Beware of the green boss and his attacks, keep your distance, shoot the boss and defeat him to escape the cave!";
+    } else if (currentLevel === 7) {
+        hintBox.textContent = "Make your way to the exit... but beware of the traps and enemies lurking!";
+    } else if (currentLevel === 8) {
+        hintBox.textContent = "Try cross to the exit if you dare... but beware of fast enemies who can damage you!";
     }
 }
 
@@ -1209,7 +1226,7 @@ function loadLevel(levelIndex) {
             x: 410,
             y: 322,
             size: 100,
-            speed: Math.floor(Math.random() * 4) + 3, 
+            speed: Math.floor(Math.random() * 5) + 4,
             startY: 322,
             endY: 672,
         };
@@ -1234,13 +1251,22 @@ function loadLevel(levelIndex) {
         };
 
         greenBatLvl9 = {
-        x: 1200,
-        y: 154,
-        size: 100,
-        speed: Math.floor(Math.random() * 5) + 8,
-        startY: 154,
-        endY: 865
-    };
+            x: 1200,
+            y: 154,
+            size: 100,
+            speed: Math.floor(Math.random() * 5) + 8,
+            startY: 154,
+            endY: 865
+        };
+
+        purpleSpiderLvl9 = {
+            x: 1420, 
+            y: 322,  
+            size: 100,
+            speed: Math.floor(Math.random() * 5) + 4,
+            startY: 322,
+            endY: 672
+        };
 
         }
 
@@ -1249,6 +1275,7 @@ function loadLevel(levelIndex) {
             batOneLvl9 = null;
             greenSpiderLvl9 = null;
             greenBatLvl9 = null;
+            purpleSpiderLvl9 = null;
         }
 
 }
@@ -1607,7 +1634,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         if (level9Spider.y >= level9Spider.endY) {
             level9Spider.y = level9Spider.startY;
 
-            level9Spider.speed = Math.floor(Math.random() * 4) + 3;
+            level9Spider.speed = Math.floor(Math.random() * 5) + 4;
         }
 
         // animate blue spider
@@ -1816,6 +1843,62 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         };
 
         if (isColliding(playerHitbox, batHitbox)) {
+
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
+            player.x = 236;
+            player.y = 540;
+            velocityY = 0;
+
+            return;
+        }
+    }
+
+    // level 9 purple spider movement
+    if (currentLevel === 8 && purpleSpiderLvl9) {
+
+        purpleSpiderLvl9.y += purpleSpiderLvl9.speed * deltaTime;
+
+        if (purpleSpiderLvl9.y >= purpleSpiderLvl9.endY) {
+            purpleSpiderLvl9.y = purpleSpiderLvl9.startY;
+
+            // random speed each spawn
+            purpleSpiderLvl9.speed = Math.floor(Math.random() * 5) + 4;
+        }
+    }
+
+    // animate purple spider
+    if (currentLevel === 8 && purpleSpiderLvl9) {
+
+        purpleSpiderFrameCounter++;
+
+        if (purpleSpiderFrameCounter >= purpleSpiderFrameDelay) {
+            purpleSpiderFrameCounter = 0;
+            purpleSpiderFrameIndex++;
+
+            if (purpleSpiderFrameIndex >= purpleSpiderFrames.length) {
+                purpleSpiderFrameIndex = 0;
+            }
+        }
+    }
+
+    // level 9 purple spider collision
+    if (currentLevel === 8 && purpleSpiderLvl9) {
+
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        const spiderHitbox = {
+            x: purpleSpiderLvl9.x + 20,
+            y: purpleSpiderLvl9.y + 20,
+            size: purpleSpiderLvl9.size - 40
+        };
+
+        if (isColliding(playerHitbox, spiderHitbox)) {
 
             playerHitSound.currentTime = 0;
             playerHitSound.play();
@@ -4096,6 +4179,22 @@ if (debugMode && currentDrag) {
             greenBatLvl9.y,
             greenBatLvl9.size,
             greenBatLvl9.size
+        );
+    }
+
+    if (
+        currentLevel === 8 &&
+        purpleSpiderLvl9 &&
+        purpleSpiderFrames[purpleSpiderFrameIndex] &&
+        purpleSpiderFrames[purpleSpiderFrameIndex].complete
+    ) {
+
+        ctx.drawImage(
+            purpleSpiderFrames[purpleSpiderFrameIndex],
+            purpleSpiderLvl9.x,
+            purpleSpiderLvl9.y,
+            purpleSpiderLvl9.size,
+            purpleSpiderLvl9.size
         );
     }
 
