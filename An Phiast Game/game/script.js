@@ -546,6 +546,20 @@ let swimFrameIndex = 0;
 let swimFrameCounter = 0;
 let swimFrameDelay = 18;
 
+// orange fish frames lvl 10
+const orangeFishFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/orangefish_" + i + ".png";
+    orangeFishFrames.push(img);
+}
+
+let orangeFishFrameIndex = 0;
+let orangeFishFrameCounter = 0;
+let orangeFishFrameDelay = 25;
+let orangeFish = null;
+
 
 
 
@@ -1306,7 +1320,31 @@ function loadLevel(levelIndex) {
             greenSpiderLvl9 = null;
             greenBatLvl9 = null;
             purpleSpiderLvl9 = null;
-        }
+    }
+
+    
+    // level 10 fish
+    if (levelIndex === 9) {
+
+        orangeFish = {
+            x: 315,
+            y: 260,
+            baseY: 260,
+
+            size: 90,
+
+            speed: 3,
+            direction: "right",
+
+            startX: 315,
+            endX: 920,
+
+            waveOffset: 0 // up down motion
+        };
+
+    } else {
+        orangeFish = null;
+    }
 
 }
 
@@ -1929,6 +1967,46 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             velocityY = 0;
 
             return;
+        }
+    }
+
+    // orange fish movement lvl 10
+    if (currentLevel === 9 && orangeFish) {
+
+        // move left/right
+        if (orangeFish.direction === "right") {
+            orangeFish.x += orangeFish.speed * deltaTime;
+        } else {
+            orangeFish.x -= orangeFish.speed * deltaTime;
+        }
+
+        // turn around
+        if (orangeFish.x >= orangeFish.endX) {
+            orangeFish.direction = "left";
+        }
+
+        if (orangeFish.x <= orangeFish.startX) {
+            orangeFish.direction = "right";
+        }
+
+        // up down motion
+        orangeFish.waveOffset += 0.1 * deltaTime;
+
+        orangeFish.y = orangeFish.baseY + Math.sin(orangeFish.waveOffset) * 10;
+    }
+
+    // fish animation
+    if (currentLevel === 9 && orangeFish) {
+
+        orangeFishFrameCounter++;
+
+        if (orangeFishFrameCounter >= orangeFishFrameDelay) {
+            orangeFishFrameCounter = 0;
+            orangeFishFrameIndex++;
+
+            if (orangeFishFrameIndex >= orangeFishFrames.length) {
+                orangeFishFrameIndex = 0;
+            }
         }
     }
 
@@ -4235,6 +4313,43 @@ if (debugMode && currentDrag) {
             purpleSpiderLvl9.size,
             purpleSpiderLvl9.size
         );
+    }
+
+    // draw orange fish level 10
+    if (
+        currentLevel === 9 &&
+        orangeFish &&
+        orangeFishFrames[orangeFishFrameIndex] &&
+        orangeFishFrames[orangeFishFrameIndex].complete
+    ) {
+
+        ctx.save();
+
+        if (orangeFish.direction === "left") {
+
+            ctx.translate(orangeFish.x + orangeFish.size, orangeFish.y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(
+                orangeFishFrames[orangeFishFrameIndex],
+                0,
+                0,
+                orangeFish.size,
+                orangeFish.size
+            );
+
+        } else {
+
+            ctx.drawImage(
+                orangeFishFrames[orangeFishFrameIndex],
+                orangeFish.x,
+                orangeFish.y,
+                orangeFish.size,
+                orangeFish.size
+            );
+        }
+
+        ctx.restore();
     }
 
         // draw player
