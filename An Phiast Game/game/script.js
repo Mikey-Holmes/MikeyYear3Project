@@ -622,6 +622,19 @@ const crownSprite = new Image();
 crownSprite.src = "assets/images/crownlvl10.png";
 let crown = null;
 
+// bubble animation lvl 10
+const bubbleFrames = [];
+
+for (let i = 1; i <= 10; i++) {
+    const img = new Image();
+    img.src = "assets/images/bubbles_" + i + ".png";
+    bubbleFrames.push(img);
+}
+
+let bubbleFrameIndex = 0;
+let bubbleFrameCounter = 0;
+let bubbleFrameDelay = 12;
+
 
 
 
@@ -893,7 +906,7 @@ const levels = [
             {x: 133, y: 175, width: 3, height: 727}
         ],
         key: {},
-        exitWall: {}
+        exitWall: {x: 140, y: 174, width: 1657, height: 3}
     }
 ];
 
@@ -920,6 +933,8 @@ function updateHintText() {
         hintBox.textContent = "Make your way to the exit... but beware of the traps and enemies lurking!";
     } else if (currentLevel === 8) {
         hintBox.textContent = "Try cross to the exit if you dare... but beware of fast enemies who can damage you!";
+    } else if (currentLevel === 9) {
+        hintBox.textContent = "Swim for your life! Avoid the fish and jellyfish, pick up the crown and swim to the surface to escape!";
     }
 }
 
@@ -2546,13 +2561,23 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             console.log("Crown collected!");
 
-            levelCompleteSound.currentTime = 0;
-            levelCompleteSound.play();
+            keyPickupSound.currentTime = 0;
+            keyPickupSound.play();
+        }
+    }
 
-            setTimeout(() => {
-                showEnding = true;
-                endGameSplashes();
-            }, 300);
+    // animate bubbles lvl 10
+    if (currentLevel === 9 && crown && !crown.collected) {
+
+        bubbleFrameCounter++;
+
+        if (bubbleFrameCounter >= bubbleFrameDelay) {
+            bubbleFrameCounter = 0;
+            bubbleFrameIndex++;
+
+            if (bubbleFrameIndex >= bubbleFrames.length) {
+                bubbleFrameIndex = 0;
+            }
         }
     }
 
@@ -3539,22 +3564,31 @@ if (!invincible && currentLevel === 2) {
             (currentLevel === 7) ||
 
             // level 9 wall auto exit
-            (currentLevel === 8)
+            (currentLevel === 8) ||
+
+            // level 10 needs crown
+            (currentLevel === 9 && crown && crown.collected)
+
+
         )
     ) 
     {
         levelCompleteSound.currentTime = 0;
         levelCompleteSound.play();
 
-        currentLevel++;
+        // lvl 10 ending
+        if (currentLevel === 9) {
 
-        if (currentLevel < levels.length) {
-            loadLevel(currentLevel);
+            showEnding = true;
+            endGameSplashes();
+
         } else {
-            if (showEnding) {
-                endGameSplashes();
-            } else {
-                currentLevel = levels.length - 1;
+
+            // normal level progression
+            currentLevel++;
+
+            if (currentLevel < levels.length) {
+                loadLevel(currentLevel);
             }
         }
     }
@@ -4803,6 +4837,26 @@ if (debugMode && currentDrag) {
             crown.y,
             crown.size,
             crown.size
+        );
+    }
+
+    // draw bubbles
+    if (
+        currentLevel === 9 &&
+        crown &&
+        !crown.collected &&
+        bubbleFrames[bubbleFrameIndex] &&
+        bubbleFrames[bubbleFrameIndex].complete
+    ) {
+
+        const bubbleSize = 60;
+
+        ctx.drawImage(
+            bubbleFrames[bubbleFrameIndex],
+            1628,
+            760,
+            bubbleSize,
+            bubbleSize
         );
     }
 
