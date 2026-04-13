@@ -573,6 +573,7 @@ let pinkFishFrameIndex = 0;
 let pinkFishFrameCounter = 0;
 let pinkFishFrameDelay = 22;
 let pinkFish = null;
+let pinkFish2 = null;
 
 // blue jellyfish frames lvl 10
 const blueJellyfishFrames = [];
@@ -1435,6 +1436,22 @@ function loadLevel(levelIndex) {
             waveOffset: 0 // up down motion
         };
 
+        pinkFish2 = {
+            x: 1090,
+            y: 330,
+            baseY: 330,
+
+            size: 90,
+
+            speed: 4,
+            direction: "right",
+
+            startX: 1090,
+            endX: 1690,
+
+            waveOffset: 0
+        };
+
         blueJellyfish = {
             x: 928,
             y: 750,
@@ -1493,6 +1510,7 @@ function loadLevel(levelIndex) {
     } else {
         orangeFish = null;
         pinkFish = null;
+        pinkFish2 = null;
         blueJellyfish = null;
         greenFish = null;
         pinkJellyfish = null;
@@ -2186,8 +2204,46 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         pinkFish.y = pinkFish.baseY + Math.sin(pinkFish.waveOffset) * 10;
     }
 
+    // pink fish 2 movement
+    if (currentLevel === 9 && pinkFish2) {
+
+        if (pinkFish2.direction === "right") {
+            pinkFish2.x += pinkFish2.speed * deltaTime;
+        } else {
+            pinkFish2.x -= pinkFish2.speed * deltaTime;
+        }
+
+        if (pinkFish2.x >= pinkFish2.endX) {
+            pinkFish2.direction = "left";
+        }
+
+        if (pinkFish2.x <= pinkFish2.startX) {
+            pinkFish2.direction = "right";
+        }
+
+        // bob motion
+        pinkFish2.waveOffset += 0.1 * deltaTime;
+
+        pinkFish2.y = pinkFish2.baseY + Math.sin(pinkFish2.waveOffset) * 10;
+    }
+
     // pink fish animation
     if (currentLevel === 9 && pinkFish) {
+
+        pinkFishFrameCounter++;
+
+        if (pinkFishFrameCounter >= pinkFishFrameDelay) {
+            pinkFishFrameCounter = 0;
+            pinkFishFrameIndex++;
+
+            if (pinkFishFrameIndex >= pinkFishFrames.length) {
+                pinkFishFrameIndex = 0;
+            }
+        }
+    }
+
+    // pink fish 2 animation
+    if (currentLevel === 9 && pinkFish2) {
 
         pinkFishFrameCounter++;
 
@@ -2319,6 +2375,56 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             if (pinkJellyfishFrameIndex >= pinkJellyfishFrames.length) {
                 pinkJellyfishFrameIndex = 0;
             }
+        }
+    }
+
+    // lvl 10 collisions for all fish and jellyfish
+    if (currentLevel === 9) {
+
+        // player hitbox
+        const playerHitbox = {
+            x: player.x + 25,
+            y: player.y + 25,
+            size: player.size - 40
+        };
+
+        // function to check enemy collision
+        function checkFishCollision(enemy) {
+
+            if (!enemy) return false;
+
+            const enemyHitbox = {
+                x: enemy.x + 20,
+                y: enemy.y + 20,
+                size: enemy.size - 40
+            };
+
+            if (isColliding(playerHitbox, enemyHitbox)) {
+
+                playerHitSound.currentTime = 0;
+                playerHitSound.play();
+
+                // respawn player
+                player.x = 190;
+                player.y = 540;
+                velocityY = 0;
+
+                return true; // stops main loop from checking other enemies after a hit
+            }
+
+            return false;
+        }
+
+        // check all enemies
+        if (
+            checkFishCollision(orangeFish) ||
+            checkFishCollision(pinkFish) ||
+            checkFishCollision(pinkFish2) ||
+            checkFishCollision(greenFish) ||
+            checkFishCollision(blueJellyfish) ||
+            checkFishCollision(pinkJellyfish)
+        ) {
+            return;
         }
     }
 
@@ -4747,6 +4853,43 @@ if (debugMode && currentDrag) {
                 pinkFish.y,
                 pinkFish.size,
                 pinkFish.size
+            );
+        }
+
+        ctx.restore();
+    }
+
+    // draw pink fish 2 level 10
+    if (
+        currentLevel === 9 &&
+        pinkFish2 &&
+        pinkFishFrames[pinkFishFrameIndex] &&
+        pinkFishFrames[pinkFishFrameIndex].complete
+    ) {
+
+        ctx.save();
+
+        if (pinkFish2.direction === "left") {
+
+            ctx.translate(pinkFish2.x + pinkFish2.size, pinkFish2.y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(
+                pinkFishFrames[pinkFishFrameIndex],
+                0,
+                0,
+                pinkFish2.size,
+                pinkFish2.size
+            );
+
+        } else {
+
+            ctx.drawImage(
+                pinkFishFrames[pinkFishFrameIndex],
+                pinkFish2.x,
+                pinkFish2.y,
+                pinkFish2.size,
+                pinkFish2.size
             );
         }
 
