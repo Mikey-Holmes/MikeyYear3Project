@@ -574,6 +574,20 @@ let pinkFishFrameCounter = 0;
 let pinkFishFrameDelay = 22;
 let pinkFish = null;
 
+// blue jellyfish frames lvl 10
+const blueJellyfishFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/bluejellyfish_" + i + ".png";
+    blueJellyfishFrames.push(img);
+}
+
+let blueJellyfishFrameIndex = 0;
+let blueJellyfishFrameCounter = 0;
+let blueJellyfishFrameDelay = 20;
+let blueJellyfish = null;
+
 
 
 
@@ -1372,9 +1386,26 @@ function loadLevel(levelIndex) {
             waveOffset: 0 // up down motion
         };
 
+        blueJellyfish = {
+            x: 928,
+            y: 750,
+            baseX: 928,
+
+            size: 100,
+
+            speed: 3,
+            direction: "up",
+
+            startY: 750,
+            endY: 343,
+
+            waveOffset: 0
+        };
+
     } else {
         orangeFish = null;
         pinkFish = null;
+        blueJellyfish = null;
     }
 
 }
@@ -2075,6 +2106,47 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (pinkFishFrameIndex >= pinkFishFrames.length) {
                 pinkFishFrameIndex = 0;
+            }
+        }
+    }
+
+    // blue jellyfish movement
+    if (currentLevel === 9 && blueJellyfish) {
+
+        // move up and down
+        if (blueJellyfish.direction === "up") {
+            blueJellyfish.y -= blueJellyfish.speed * deltaTime;
+
+            if (blueJellyfish.y <= blueJellyfish.endY) {
+                blueJellyfish.direction = "down";
+            }
+
+        } else {
+            blueJellyfish.y += blueJellyfish.speed * deltaTime;
+
+            if (blueJellyfish.y >= blueJellyfish.startY) {
+                blueJellyfish.direction = "up";
+            }
+        }
+
+        // side-to-side float 
+        blueJellyfish.waveOffset += 0.08 * deltaTime;
+
+        blueJellyfish.x =
+            blueJellyfish.baseX + Math.sin(blueJellyfish.waveOffset) * 5;
+    }
+
+    // blue jellyfish animation
+    if (currentLevel === 9 && blueJellyfish) {
+
+        blueJellyfishFrameCounter++;
+
+        if (blueJellyfishFrameCounter >= blueJellyfishFrameDelay) {
+            blueJellyfishFrameCounter = 0;
+            blueJellyfishFrameIndex++;
+
+            if (blueJellyfishFrameIndex >= blueJellyfishFrames.length) {
+                blueJellyfishFrameIndex = 0;
             }
         }
     }
@@ -4456,6 +4528,23 @@ if (debugMode && currentDrag) {
         }
 
         ctx.restore();
+    }
+
+    // draw blue jellyfish level 10
+    if (
+        currentLevel === 9 &&
+        blueJellyfish &&
+        blueJellyfishFrames[blueJellyfishFrameIndex] &&
+        blueJellyfishFrames[blueJellyfishFrameIndex].complete
+    ) {
+
+        ctx.drawImage(
+            blueJellyfishFrames[blueJellyfishFrameIndex],
+            blueJellyfish.x,
+            blueJellyfish.y,
+            blueJellyfish.size,
+            blueJellyfish.size
+        );
     }
 
         // draw player
