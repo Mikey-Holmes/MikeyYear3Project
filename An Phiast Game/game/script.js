@@ -560,6 +560,20 @@ let orangeFishFrameCounter = 0;
 let orangeFishFrameDelay = 25;
 let orangeFish = null;
 
+// pink fish frames lvl 10
+const pinkFishFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/pinkfish_" + i + ".png";
+    pinkFishFrames.push(img);
+}
+
+let pinkFishFrameIndex = 0;
+let pinkFishFrameCounter = 0;
+let pinkFishFrameDelay = 22;
+let pinkFish = null;
+
 
 
 
@@ -1333,7 +1347,7 @@ function loadLevel(levelIndex) {
 
             size: 90,
 
-            speed: 3,
+            speed: 5,
             direction: "right",
 
             startX: 315,
@@ -1342,8 +1356,25 @@ function loadLevel(levelIndex) {
             waveOffset: 0 // up down motion
         };
 
+        pinkFish = {
+            x: 170,
+            y: 800,
+            baseY: 800,
+
+            size: 90,
+
+            speed: 4,
+            direction: "right",
+
+            startX: 170,
+            endX: 880,
+
+            waveOffset: 0 // up down motion
+        };
+
     } else {
         orangeFish = null;
+        pinkFish = null;
     }
 
 }
@@ -1973,7 +2004,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // orange fish movement lvl 10
     if (currentLevel === 9 && orangeFish) {
 
-        // move left/right
+        // move left and right
         if (orangeFish.direction === "right") {
             orangeFish.x += orangeFish.speed * deltaTime;
         } else {
@@ -2006,6 +2037,44 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (orangeFishFrameIndex >= orangeFishFrames.length) {
                 orangeFishFrameIndex = 0;
+            }
+        }
+    }
+
+    // pink fish movement
+    if (currentLevel === 9 && pinkFish) {
+
+        if (pinkFish.direction === "right") {
+            pinkFish.x += pinkFish.speed * deltaTime;
+        } else {
+            pinkFish.x -= pinkFish.speed * deltaTime;
+        }
+
+        if (pinkFish.x >= pinkFish.endX) {
+            pinkFish.direction = "left";
+        }
+
+        if (pinkFish.x <= pinkFish.startX) {
+            pinkFish.direction = "right";
+        }
+
+        // bob up and down motion
+        pinkFish.waveOffset += 0.1 * deltaTime;
+
+        pinkFish.y = pinkFish.baseY + Math.sin(pinkFish.waveOffset) * 10;
+    }
+
+    // pink fish animation
+    if (currentLevel === 9 && pinkFish) {
+
+        pinkFishFrameCounter++;
+
+        if (pinkFishFrameCounter >= pinkFishFrameDelay) {
+            pinkFishFrameCounter = 0;
+            pinkFishFrameIndex++;
+
+            if (pinkFishFrameIndex >= pinkFishFrames.length) {
+                pinkFishFrameIndex = 0;
             }
         }
     }
@@ -4346,6 +4415,43 @@ if (debugMode && currentDrag) {
                 orangeFish.y,
                 orangeFish.size,
                 orangeFish.size
+            );
+        }
+
+        ctx.restore();
+    }
+
+    // draw pink fish level 10
+    if (
+        currentLevel === 9 &&
+        pinkFish &&
+        pinkFishFrames[pinkFishFrameIndex] &&
+        pinkFishFrames[pinkFishFrameIndex].complete
+    ) {
+
+        ctx.save();
+
+        if (pinkFish.direction === "left") {
+
+            ctx.translate(pinkFish.x + pinkFish.size, pinkFish.y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(
+                pinkFishFrames[pinkFishFrameIndex],
+                0,
+                0,
+                pinkFish.size,
+                pinkFish.size
+            );
+
+        } else {
+
+            ctx.drawImage(
+                pinkFishFrames[pinkFishFrameIndex],
+                pinkFish.x,
+                pinkFish.y,
+                pinkFish.size,
+                pinkFish.size
             );
         }
 
