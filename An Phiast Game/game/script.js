@@ -533,6 +533,19 @@ let purpleSpiderFrameCounter = 0;
 let purpleSpiderFrameDelay = 10;
 let purpleSpiderLvl9 = null;
 
+// swim player sprite lvl 10
+const swimFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/playerswim_" + i + ".png";
+    swimFrames.push(img);
+}
+
+let swimFrameIndex = 0;
+let swimFrameCounter = 0;
+let swimFrameDelay = 18;
+
 
 
 
@@ -798,7 +811,10 @@ const levels = [
     {
     backgroundSrc: "assets/images/background_10.png",//background lvl 10
         walls: [
-            {},
+            {x: 140, y: 174, width: 1657, height: 3},
+            {x: 1788, y: 177, width: 3, height: 733},
+            {x: 130, y: 903, width: 1657, height: 6},
+            {x: 133, y: 175, width: 3, height: 727}
         ],
         key: {},
         exitWall: {}
@@ -2095,6 +2111,21 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     } else {
         player.frameX = 0;
+    }
+
+    // swimming animation lvl 10
+    if (currentLevel === 9) {
+
+        swimFrameCounter++;
+
+        if (swimFrameCounter >= swimFrameDelay) {
+            swimFrameCounter = 0;
+            swimFrameIndex++;
+
+            if (swimFrameIndex >= swimFrames.length) {
+                swimFrameIndex = 0;
+            }
+        }
     }
 
     // screen bounds
@@ -4201,16 +4232,58 @@ if (debugMode && currentDrag) {
         );
     }
 
-    // draw player sprite
-    const sprite = sprites[player.direction];
-    const frameWidth = sprite.width / (player.maxFrame + 1);
-    const frameHeight = sprite.height;
+        // draw player
+        if (currentLevel === 9) {
 
-    ctx.drawImage(
-        sprite,
-        player.frameX * frameWidth, 0, frameWidth, frameHeight,
-        player.x, player.y, player.size, player.size
-    );
+        const swimImage = swimFrames[swimFrameIndex];
+        const swimScale = 1.5;
+
+        if (swimImage && swimImage.complete) {
+
+            ctx.save();
+
+            const drawSize = player.size * swimScale;
+
+            // flip if moving left
+            if (player.direction === "left") {
+                ctx.translate(player.x + drawSize, player.y);
+                ctx.scale(-1, 1);
+
+                ctx.drawImage(
+                    swimImage,
+                    0,
+                    0,
+                    drawSize,
+                    drawSize
+                );
+            } 
+            else {
+                ctx.drawImage(
+                    swimImage,
+                    player.x,
+                    player.y,
+                    drawSize,
+                    drawSize
+                );
+            }
+
+            ctx.restore();
+        }
+
+    } else {
+
+        // normal player animations
+        const sprite = sprites[player.direction];
+        const frameWidth = sprite.width / (player.maxFrame + 1);
+        const frameHeight = sprite.height;
+
+        ctx.drawImage(
+            sprite,
+            player.frameX * frameWidth, 0, frameWidth, frameHeight,
+            player.x, player.y, player.size, player.size
+        );
+    }
+
     // draw enemy 1
     if (enemy1) {
         const frameWidth1 = enemy1Sprite.width / (enemy1.maxFrame + 1);
