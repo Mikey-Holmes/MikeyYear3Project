@@ -617,6 +617,11 @@ let pinkJellyfishFrameCounter = 0;
 let pinkJellyfishFrameDelay = 18;
 let pinkJellyfish = null;
 
+// crown sprite for lvl 10
+const crownSprite = new Image();
+crownSprite.src = "assets/images/crownlvl10.png";
+let crown = null;
+
 
 
 
@@ -1463,12 +1468,20 @@ function loadLevel(levelIndex) {
             waveOffset: 0
         };
 
+        crown = {
+            x: 1620,
+            y: 800,
+            size: 80,
+            collected: false
+        };
+
     } else {
         orangeFish = null;
         pinkFish = null;
         blueJellyfish = null;
         greenFish = null;
         pinkJellyfish = null;
+        crown = null;
     }
 
 }
@@ -2508,6 +2521,39 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
         keyPickupSound.currentTime = 0;
         keyPickupSound.play();
+    }
+
+    // crown collection lvl 10
+    if (currentLevel === 9 && crown && !crown.collected) {
+
+        const playerHitbox = {
+            x: player.x + 15,
+            y: player.y + 15,
+            size: player.size - 30
+        };
+
+        const crownPadding = 25;
+
+        const crownHitbox = {
+            x: crown.x + crownPadding,
+            y: crown.y + crownPadding,
+            size: crown.size - crownPadding * 2
+        };
+
+        if (isColliding(playerHitbox, crownHitbox)) {
+
+            crown.collected = true;
+
+            console.log("Crown collected!");
+
+            levelCompleteSound.currentTime = 0;
+            levelCompleteSound.play();
+
+            setTimeout(() => {
+                showEnding = true;
+                endGameSplashes();
+            }, 300);
+        }
     }
 
     // pick up bow and spawn enemies in level 3
@@ -4741,6 +4787,22 @@ if (debugMode && currentDrag) {
             pinkJellyfish.y,
             pinkJellyfish.size,
             pinkJellyfish.size
+        );
+    }
+
+    // draw crown level 10
+    if (
+        currentLevel === 9 &&
+        crown &&
+        !crown.collected &&
+        crownSprite.complete
+    ) {
+        ctx.drawImage(
+            crownSprite,
+            crown.x,
+            crown.y,
+            crown.size,
+            crown.size
         );
     }
 
