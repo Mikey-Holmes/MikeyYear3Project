@@ -157,7 +157,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 10.0, // 6 is default, adjusted for testing
+    speed: 10, // 6 is default, adjusted for testing
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -602,6 +602,20 @@ let greenFishFrameCounter = 0;
 let greenFishFrameDelay = 20;
 
 let greenFish = null;
+
+// pink jellyfish frames lvl 10
+const pinkJellyfishFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/pinkjellyfish_" + i + ".png";
+    pinkJellyfishFrames.push(img);
+}
+
+let pinkJellyfishFrameIndex = 0;
+let pinkJellyfishFrameCounter = 0;
+let pinkJellyfishFrameDelay = 18;
+let pinkJellyfish = null;
 
 
 
@@ -1418,7 +1432,7 @@ function loadLevel(levelIndex) {
         };
 
         greenFish = {
-            x: 1180,
+            x: 1200,
             y: 595,
             baseY: 595,
 
@@ -1427,8 +1441,24 @@ function loadLevel(levelIndex) {
             speed: 8,
             direction: "right",
 
-            startX: 1180,
+            startX: 1200,
             endX: 1700,
+
+            waveOffset: 0
+        };
+
+        pinkJellyfish = {
+            x: 1147,
+            y: 818,
+            baseX: 1147,
+
+            size: 100,
+
+            speed: 6,
+            direction: "up",
+
+            startY: 818,
+            endY: 450,
 
             waveOffset: 0
         };
@@ -1438,6 +1468,7 @@ function loadLevel(levelIndex) {
         pinkFish = null;
         blueJellyfish = null;
         greenFish = null;
+        pinkJellyfish = null;
     }
 
 }
@@ -2218,6 +2249,47 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (greenFishFrameIndex >= greenFishFrames.length) {
                 greenFishFrameIndex = 0;
+            }
+        }
+    }
+
+    // pink jellyfish movement
+    if (currentLevel === 9 && pinkJellyfish) {
+
+        // move up and down
+        if (pinkJellyfish.direction === "up") {
+            pinkJellyfish.y -= pinkJellyfish.speed * deltaTime;
+
+            if (pinkJellyfish.y <= pinkJellyfish.endY) {
+                pinkJellyfish.direction = "down";
+            }
+
+        } else {
+            pinkJellyfish.y += pinkJellyfish.speed * deltaTime;
+
+            if (pinkJellyfish.y >= pinkJellyfish.startY) {
+                pinkJellyfish.direction = "up";
+            }
+        }
+
+        // side to side float
+        pinkJellyfish.waveOffset += 0.08 * deltaTime;
+
+        pinkJellyfish.x =
+            pinkJellyfish.baseX + Math.sin(pinkJellyfish.waveOffset) * 5;
+    }
+
+    // pink jellyfish animation
+    if (currentLevel === 9 && pinkJellyfish) {
+
+        pinkJellyfishFrameCounter++;
+
+        if (pinkJellyfishFrameCounter >= pinkJellyfishFrameDelay) {
+            pinkJellyfishFrameCounter = 0;
+            pinkJellyfishFrameIndex++;
+
+            if (pinkJellyfishFrameIndex >= pinkJellyfishFrames.length) {
+                pinkJellyfishFrameIndex = 0;
             }
         }
     }
@@ -4653,6 +4725,23 @@ if (debugMode && currentDrag) {
         }
 
         ctx.restore();
+    }
+
+    // draw pink jellyfish level 10
+    if (
+        currentLevel === 9 &&
+        pinkJellyfish &&
+        pinkJellyfishFrames[pinkJellyfishFrameIndex] &&
+        pinkJellyfishFrames[pinkJellyfishFrameIndex].complete
+    ) {
+
+        ctx.drawImage(
+            pinkJellyfishFrames[pinkJellyfishFrameIndex],
+            pinkJellyfish.x,
+            pinkJellyfish.y,
+            pinkJellyfish.size,
+            pinkJellyfish.size
+        );
     }
 
         // draw player
