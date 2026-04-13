@@ -588,6 +588,21 @@ let blueJellyfishFrameCounter = 0;
 let blueJellyfishFrameDelay = 20;
 let blueJellyfish = null;
 
+// green fish frames lvl 10
+const greenFishFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/greenfish_" + i + ".png";
+    greenFishFrames.push(img);
+}
+
+let greenFishFrameIndex = 0;
+let greenFishFrameCounter = 0;
+let greenFishFrameDelay = 20;
+
+let greenFish = null;
+
 
 
 
@@ -1402,10 +1417,27 @@ function loadLevel(levelIndex) {
             waveOffset: 0
         };
 
+        greenFish = {
+            x: 1180,
+            y: 595,
+            baseY: 595,
+
+            size: 90,
+
+            speed: 8,
+            direction: "right",
+
+            startX: 1180,
+            endX: 1700,
+
+            waveOffset: 0
+        };
+
     } else {
         orangeFish = null;
         pinkFish = null;
         blueJellyfish = null;
+        greenFish = null;
     }
 
 }
@@ -2147,6 +2179,45 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (blueJellyfishFrameIndex >= blueJellyfishFrames.length) {
                 blueJellyfishFrameIndex = 0;
+            }
+        }
+    }
+
+    // green fish movement
+    if (currentLevel === 9 && greenFish) {
+
+        if (greenFish.direction === "right") {
+            greenFish.x += greenFish.speed * deltaTime;
+        } else {
+            greenFish.x -= greenFish.speed * deltaTime;
+        }
+
+        if (greenFish.x >= greenFish.endX) {
+            greenFish.direction = "left";
+        }
+
+        if (greenFish.x <= greenFish.startX) {
+            greenFish.direction = "right";
+        }
+
+        // bob motion
+        greenFish.waveOffset += 0.1 * deltaTime;
+
+        greenFish.y =
+            greenFish.baseY + Math.sin(greenFish.waveOffset) * 10;
+    }
+
+    // green fish animation
+    if (currentLevel === 9 && greenFish) {
+
+        greenFishFrameCounter++;
+
+        if (greenFishFrameCounter >= greenFishFrameDelay) {
+            greenFishFrameCounter = 0;
+            greenFishFrameIndex++;
+
+            if (greenFishFrameIndex >= greenFishFrames.length) {
+                greenFishFrameIndex = 0;
             }
         }
     }
@@ -4545,6 +4616,43 @@ if (debugMode && currentDrag) {
             blueJellyfish.size,
             blueJellyfish.size
         );
+    }
+
+    // draw green fish level 10
+    if (
+        currentLevel === 9 &&
+        greenFish &&
+        greenFishFrames[greenFishFrameIndex] &&
+        greenFishFrames[greenFishFrameIndex].complete
+    ) {
+
+        ctx.save();
+
+        if (greenFish.direction === "left") {
+
+            ctx.translate(greenFish.x + greenFish.size, greenFish.y);
+            ctx.scale(-1, 1);
+
+            ctx.drawImage(
+                greenFishFrames[greenFishFrameIndex],
+                0,
+                0,
+                greenFish.size,
+                greenFish.size
+            );
+
+        } else {
+
+            ctx.drawImage(
+                greenFishFrames[greenFishFrameIndex],
+                greenFish.x,
+                greenFish.y,
+                greenFish.size,
+                greenFish.size
+            );
+        }
+
+        ctx.restore();
     }
 
         // draw player
