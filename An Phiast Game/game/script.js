@@ -157,7 +157,7 @@ let player = {
     x: 250,
     y: 550,
     size: 65,
-    speed: 6.0, // 6 is default, adjusted for testing
+    speed: 10.0, // 6 is default, adjusted for testing
     frameX: 0,
     maxFrame: 3,
     frameDelay: 10,
@@ -790,6 +790,15 @@ const levels = [
             {x: 476, y: 840, width: 89, height: 1},
             {x: 466, y: 750, width: 2, height: 94},
             {x: 189, y: 747, width: 279, height: 1}
+        ],
+        key: {},
+        exitWall: {x: 1723, y: 330, width: 3, height: 430}
+    },
+
+    {
+    backgroundSrc: "assets/images/background_10.png",//background lvl 10
+        walls: [
+            {},
         ],
         key: {},
         exitWall: {}
@@ -1616,26 +1625,17 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
 
     // level 9 spider movement
+
     if (currentLevel === 8 && level9Spider) {
 
-        level9Spider.y += level9Spider.speed * deltaTime;
+    // movement
+    level9Spider.y += level9Spider.speed * deltaTime;
 
-        // reached end reset to top
-        if (level9Spider.y >= level9Spider.endY) {
-            level9Spider.y = level9Spider.startY;
-        }
+    if (level9Spider.y >= level9Spider.endY) {
+        level9Spider.y = level9Spider.startY;
+
+        level9Spider.speed = Math.floor(Math.random() * 5) + 4;
     }
-
-        if (currentLevel === 8 && level9Spider) {
-
-        // movement
-        level9Spider.y += level9Spider.speed * deltaTime;
-
-        if (level9Spider.y >= level9Spider.endY) {
-            level9Spider.y = level9Spider.startY;
-
-            level9Spider.speed = Math.floor(Math.random() * 5) + 4;
-        }
 
         // animate blue spider
         if (currentLevel === 8 && level9Spider) {
@@ -3091,8 +3091,11 @@ if (!invincible && currentLevel === 2) {
             // level 7 needs boss score
             (currentLevel === 6 && bossScore >= 150) ||
 
-            //level 8
-            (currentLevel === 7)
+            //level 8 wall auto exit
+            (currentLevel === 7) ||
+
+            // level 9 wall auto exit
+            (currentLevel === 8)
         )
     ) 
     {
