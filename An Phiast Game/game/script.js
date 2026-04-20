@@ -1351,6 +1351,7 @@ function loadLevel(levelIndex) {
             speed: Math.floor(Math.random() * 5) + 4,
             startY: 322,
             endY: 672,
+            direction: "down"
         };
 
 
@@ -1360,7 +1361,8 @@ function loadLevel(levelIndex) {
             size: 100,
             speed: Math.floor(Math.random() * 6) + 9,
             startY: 154,
-            endY: 865
+            endY: 865,
+            direction: "down"
         };
 
         greenSpiderLvl9 = {
@@ -1369,7 +1371,8 @@ function loadLevel(levelIndex) {
             size: 100,
             speed: Math.floor(Math.random() * 5) + 9,
             startY: 154,
-            endY: 865
+            endY: 865,
+            direction: "down"
         };
 
         greenBatLvl9 = {
@@ -1378,7 +1381,8 @@ function loadLevel(levelIndex) {
             size: 100,
             speed: Math.floor(Math.random() * 5) + 8,
             startY: 154,
-            endY: 865
+            endY: 865,
+            direction: "down"
         };
 
         purpleSpiderLvl9 = {
@@ -1387,7 +1391,8 @@ function loadLevel(levelIndex) {
             size: 100,
             speed: Math.floor(Math.random() * 5) + 4,
             startY: 322,
-            endY: 672
+            endY: 672,
+            direction: "down"
         };
 
         }
@@ -1859,12 +1864,30 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     if (currentLevel === 8 && level9Spider) {
 
     // movement
-    level9Spider.y += level9Spider.speed * deltaTime;
+    if (currentLevel === 8 && level9Spider) {
 
-    if (level9Spider.y >= level9Spider.endY) {
-        level9Spider.y = level9Spider.startY;
+        if (level9Spider.direction === "down") {
 
-        level9Spider.speed = Math.floor(Math.random() * 5) + 4;
+            level9Spider.y += level9Spider.speed * deltaTime;
+
+            if (level9Spider.y >= level9Spider.endY) {
+                level9Spider.y = level9Spider.endY;
+                level9Spider.direction = "up";
+
+                level9Spider.speed = Math.floor(Math.random() * 5) + 4;
+            }
+
+        } else {
+
+            level9Spider.y -= level9Spider.speed * deltaTime;
+
+            if (level9Spider.y <= level9Spider.startY) {
+                level9Spider.y = level9Spider.startY;
+                level9Spider.direction = "down";
+
+                level9Spider.speed = Math.floor(Math.random() * 5) + 4;
+            }
+        }
     }
 
         // animate blue spider
@@ -1918,13 +1941,27 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // level 9 bat movement
     if (currentLevel === 8 && batOneLvl9) {
 
-        batOneLvl9.y += batOneLvl9.speed * deltaTime;
+        if (batOneLvl9.direction === "down") {
 
-        if (batOneLvl9.y >= batOneLvl9.endY) {
-            batOneLvl9.y = batOneLvl9.startY;
+            batOneLvl9.y += batOneLvl9.speed * deltaTime;
 
-            // random speed each cycle
-            batOneLvl9.speed = Math.floor(Math.random() * 6) + 9;
+            if (batOneLvl9.y >= batOneLvl9.endY) {
+                batOneLvl9.y = batOneLvl9.endY;
+                batOneLvl9.direction = "up";
+
+                batOneLvl9.speed = Math.floor(Math.random() * 6) + 9;
+            }
+
+        } else {
+
+            batOneLvl9.y -= batOneLvl9.speed * deltaTime;
+
+            if (batOneLvl9.y <= batOneLvl9.startY) {
+                batOneLvl9.y = batOneLvl9.startY;
+                batOneLvl9.direction = "down";
+
+                batOneLvl9.speed = Math.floor(Math.random() * 6) + 9;
+            }
         }
     }
 
@@ -1974,13 +2011,27 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // level 9 green spider movement
     if (currentLevel === 8 && greenSpiderLvl9) {
 
-        greenSpiderLvl9.y += greenSpiderLvl9.speed * deltaTime;
+        if (greenSpiderLvl9.direction === "down") {
 
-        if (greenSpiderLvl9.y >= greenSpiderLvl9.endY) {
-            greenSpiderLvl9.y = greenSpiderLvl9.startY;
+            greenSpiderLvl9.y += greenSpiderLvl9.speed * deltaTime;
 
-            // random speed
-            greenSpiderLvl9.speed = Math.floor(Math.random() * 5) + 9;
+            if (greenSpiderLvl9.y >= greenSpiderLvl9.endY) {
+                greenSpiderLvl9.y = greenSpiderLvl9.endY;
+                greenSpiderLvl9.direction = "up";
+
+                greenSpiderLvl9.speed = Math.floor(Math.random() * 5) + 9;
+            }
+
+        } else {
+
+            greenSpiderLvl9.y -= greenSpiderLvl9.speed * deltaTime;
+
+            if (greenSpiderLvl9.y <= greenSpiderLvl9.startY) {
+                greenSpiderLvl9.y = greenSpiderLvl9.startY;
+                greenSpiderLvl9.direction = "down";
+
+                greenSpiderLvl9.speed = Math.floor(Math.random() * 5) + 9;
+            }
         }
     }
 
@@ -2032,13 +2083,27 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // level 9 green bat movement
     if (currentLevel === 8 && greenBatLvl9) {
 
-        greenBatLvl9.y += greenBatLvl9.speed * deltaTime;
+        if (greenBatLvl9.direction === "down") {
 
-        if (greenBatLvl9.y >= greenBatLvl9.endY) {
-            greenBatLvl9.y = greenBatLvl9.startY;
+            greenBatLvl9.y += greenBatLvl9.speed * deltaTime;
 
-            // random speed
-            greenBatLvl9.speed = Math.floor(Math.random() * 5) + 8;
+            if (greenBatLvl9.y >= greenBatLvl9.endY) {
+                greenBatLvl9.y = greenBatLvl9.endY;
+                greenBatLvl9.direction = "up";
+
+                greenBatLvl9.speed = Math.floor(Math.random() * 5) + 8;
+            }
+
+        } else {
+
+            greenBatLvl9.y -= greenBatLvl9.speed * deltaTime;
+
+            if (greenBatLvl9.y <= greenBatLvl9.startY) {
+                greenBatLvl9.y = greenBatLvl9.startY;
+                greenBatLvl9.direction = "down";
+
+                greenBatLvl9.speed = Math.floor(Math.random() * 5) + 8;
+            }
         }
     }
 
@@ -2088,13 +2153,27 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     // level 9 purple spider movement
     if (currentLevel === 8 && purpleSpiderLvl9) {
 
-        purpleSpiderLvl9.y += purpleSpiderLvl9.speed * deltaTime;
+        if (purpleSpiderLvl9.direction === "down") {
 
-        if (purpleSpiderLvl9.y >= purpleSpiderLvl9.endY) {
-            purpleSpiderLvl9.y = purpleSpiderLvl9.startY;
+            purpleSpiderLvl9.y += purpleSpiderLvl9.speed * deltaTime;
 
-            // random speed each spawn
-            purpleSpiderLvl9.speed = Math.floor(Math.random() * 5) + 4;
+            if (purpleSpiderLvl9.y >= purpleSpiderLvl9.endY) {
+                purpleSpiderLvl9.y = purpleSpiderLvl9.endY;
+                purpleSpiderLvl9.direction = "up";
+
+                purpleSpiderLvl9.speed = Math.floor(Math.random() * 5) + 4;
+            }
+
+        } else {
+
+            purpleSpiderLvl9.y -= purpleSpiderLvl9.speed * deltaTime;
+
+            if (purpleSpiderLvl9.y <= purpleSpiderLvl9.startY) {
+                purpleSpiderLvl9.y = purpleSpiderLvl9.startY;
+                purpleSpiderLvl9.direction = "down";
+
+                purpleSpiderLvl9.speed = Math.floor(Math.random() * 5) + 4;
+            }
         }
     }
 
