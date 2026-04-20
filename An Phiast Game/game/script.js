@@ -636,6 +636,10 @@ let bubbleFrameIndex = 0;
 let bubbleFrameCounter = 0;
 let bubbleFrameDelay = 12;
 
+const underwaterSound = new Audio("assets/sounds/underwater.mp3");
+underwaterSound.loop = true;
+underwaterSound.volume = 0.3;
+
 
 
 
@@ -1651,19 +1655,49 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         nextY += velocityY * deltaTime;
     }
 
-        // walking sound
+    // lvl 10 sounds
+    if (currentLevel === 9) {
+
+    // stop cave background
+    if (!backgroundSound.paused) {
+        backgroundSound.pause();
+    }
+
+    // stop walking sound
+    if (!walkingSound.paused) {
+        walkingSound.pause();
+    }
+
+    // play underwater sound
+    if (underwaterSound.paused) {
+        underwaterSound.currentTime = 0;
+        underwaterSound.play();
+    }
+
+} else {
+
+    // stop underwater sound
+    if (!underwaterSound.paused) {
+        underwaterSound.pause();
+    }
+
+    // play cave background
+    if (backgroundSound.paused) {
+        backgroundSound.play();
+    }
+
+    // walking sound when moving
     if (moving) {
-        
         if (walkingSound.paused) {
-            walkingSound.currentTime = 0; // start from beginning
+            walkingSound.currentTime = 0;
             walkingSound.play();
         }
     } else {
-        // stop sound when player stops moving
         if (!walkingSound.paused) {
             walkingSound.pause();
         }
     }
+}
 
     // animate lava background level 4 - 6
     if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
@@ -5383,7 +5417,7 @@ startButton.addEventListener("click", function() {
 
         }, 2000);
 
-    }, 50); // 18 second delay
+    }, 50); // scroll fade in time
 
 });
 
