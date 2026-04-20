@@ -589,6 +589,7 @@ let blueJellyfishFrameCounter = 0;
 let blueJellyfishFrameDelay = 20;
 let blueJellyfish = null;
 
+/*
 // green fish frames lvl 10
 const greenFishFrames = [];
 
@@ -602,7 +603,7 @@ let greenFishFrameIndex = 0;
 let greenFishFrameCounter = 0;
 let greenFishFrameDelay = 20;
 
-let greenFish = null;
+let greenFish = null; */
 
 // pink jellyfish frames lvl 10
 const pinkJellyfishFrames = [];
@@ -636,9 +637,26 @@ let bubbleFrameIndex = 0;
 let bubbleFrameCounter = 0;
 let bubbleFrameDelay = 12;
 
+// octopus animation frames
+const octopusFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/octopus_" + i + ".png";
+    octopusFrames.push(img);
+}
+
+let octopusFrameIndex = 0;
+let octopusFrameCounter = 0;
+let octopusFrameDelay = 20;
+let octopus = null;
+
+// water audio for level 10
 const underwaterSound = new Audio("assets/sounds/underwater.mp3");
 underwaterSound.loop = true;
 underwaterSound.volume = 0.3;
+
+
 
 
 
@@ -1477,6 +1495,7 @@ function loadLevel(levelIndex) {
             waveOffset: 0
         };
 
+        /*
         greenFish = {
             x: 1200,
             y: 595,
@@ -1491,7 +1510,7 @@ function loadLevel(levelIndex) {
             endX: 1700,
 
             waveOffset: 0
-        };
+        }; */
 
         pinkJellyfish = {
             x: 1147,
@@ -1516,14 +1535,21 @@ function loadLevel(levelIndex) {
             collected: false
         };
 
+        octopus = {
+            x: 1607,
+            y: 640,
+            size: 120
+        };
+
     } else {
         orangeFish = null;
         pinkFish = null;
         pinkFish2 = null;
         blueJellyfish = null;
-        greenFish = null;
+        /* greenFish = null; */
         pinkJellyfish = null;
         crown = null;
+        octopus = null;
     }
 
 }
@@ -2411,6 +2437,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+    /*
     // green fish movement
     if (currentLevel === 9 && greenFish) {
 
@@ -2450,6 +2477,8 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+    */
+
     // pink jellyfish movement
     if (currentLevel === 9 && pinkJellyfish) {
 
@@ -2487,6 +2516,20 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (pinkJellyfishFrameIndex >= pinkJellyfishFrames.length) {
                 pinkJellyfishFrameIndex = 0;
+            }
+        }
+    }
+    // octopus animation
+    if (currentLevel === 9 && octopus) {
+
+        octopusFrameCounter++;
+
+        if (octopusFrameCounter >= octopusFrameDelay) {
+            octopusFrameCounter = 0;
+            octopusFrameIndex++;
+
+            if (octopusFrameIndex >= octopusFrames.length) {
+                octopusFrameIndex = 0;
             }
         }
     }
@@ -2533,7 +2576,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             checkFishCollision(orangeFish) ||
             checkFishCollision(pinkFish) ||
             checkFishCollision(pinkFish2) ||
-            checkFishCollision(greenFish) ||
+            /* checkFishCollision(greenFish) || */
             checkFishCollision(blueJellyfish) ||
             checkFishCollision(pinkJellyfish)
         ) {
@@ -5026,6 +5069,7 @@ if (debugMode && currentDrag) {
         );
     }
 
+    /*
     // draw green fish level 10
     if (
         currentLevel === 9 &&
@@ -5062,6 +5106,7 @@ if (debugMode && currentDrag) {
 
         ctx.restore();
     }
+    */
 
     // draw pink jellyfish level 10
     if (
@@ -5113,6 +5158,17 @@ if (debugMode && currentDrag) {
             760,
             bubbleSize,
             bubbleSize
+        );
+    }
+
+    // draw octopus level 10
+    if (currentLevel === 9 && octopus) {
+        ctx.drawImage(
+            octopusFrames[octopusFrameIndex],
+            octopus.x,
+            octopus.y,
+            octopus.size,
+            octopus.size
         );
     }
 
