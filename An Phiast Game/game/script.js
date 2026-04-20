@@ -656,6 +656,20 @@ const underwaterSound = new Audio("assets/sounds/underwater.mp3");
 underwaterSound.loop = true;
 underwaterSound.volume = 0.3;
 
+//shooting water animation lvl 10
+const waterShootFrames = [];
+
+for (let i = 1; i <= 5; i++) {
+    const img = new Image();
+    img.src = "assets/images/watershoot_" + i + ".png";
+    waterShootFrames.push(img);
+}
+
+let waterShootFrameIndex = 0;
+let waterShootFrameCounter = 0;
+let waterShootFrameDelay = 10;
+let waterShoot = null;
+
 
 
 
@@ -1536,9 +1550,9 @@ function loadLevel(levelIndex) {
         };
 
         octopus = {
-            x: 1607,
-            y: 640,
-            size: 120
+            x: 1560,
+            y: 600,
+            size: 180
         };
 
     } else {
@@ -1595,6 +1609,27 @@ window.addEventListener("keydown", function(event) {
             previousLevel();
         }
 
+    }
+
+    if (key === " " && currentLevel === 9 && !waterShoot) {
+
+        let direction = "right";
+
+        if (player.direction === "left") {
+            direction = "left";
+        }
+
+        waterShoot = {
+            x: player.x + player.size / 2,
+            y: player.y + player.size / 2,
+            size: 60,
+            speed: 12,
+            direction: direction
+        };
+
+        // reset animation
+        waterShootFrameIndex = 0;
+        waterShootFrameCounter = 0;
     }
 
 });
@@ -2530,6 +2565,37 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             if (octopusFrameIndex >= octopusFrames.length) {
                 octopusFrameIndex = 0;
+            }
+        }
+    }
+
+    // water shoot movement and animation
+    if (currentLevel === 9 && waterShoot) {
+
+        // movement
+        if (waterShoot.direction === "right") {
+            waterShoot.x += waterShoot.speed * deltaTime;
+        } else {
+            waterShoot.x -= waterShoot.speed * deltaTime;
+        }
+
+        // animation
+        waterShootFrameCounter++;
+
+        if (waterShootFrameCounter >= waterShootFrameDelay) {
+            waterShootFrameCounter = 0;
+            waterShootFrameIndex++;
+
+            if (waterShootFrameIndex >= waterShootFrames.length) {
+                waterShootFrameIndex = 0;
+            }
+        }
+
+        // collision with walls
+        for (let wall of walls) {
+            if (isColliding(waterShoot, wall)) {
+                waterShoot = null;
+                break;
             }
         }
     }
@@ -5169,6 +5235,17 @@ if (debugMode && currentDrag) {
             octopus.y,
             octopus.size,
             octopus.size
+        );
+    }
+
+    // draw water shoot level 10
+    if (currentLevel === 9 && waterShoot) {
+        ctx.drawImage(
+            waterShootFrames[waterShootFrameIndex],
+            waterShoot.x,
+            waterShoot.y,
+            waterShoot.size,
+            waterShoot.size
         );
     }
 
