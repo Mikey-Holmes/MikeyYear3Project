@@ -650,6 +650,8 @@ let octopusFrameIndex = 0;
 let octopusFrameCounter = 0;
 let octopusFrameDelay = 20;
 let octopus = null;
+let octopusHealth = 150;
+let octopusMaxHealth = 150;
 
 // water audio for level 10
 const underwaterSound = new Audio("assets/sounds/underwater.mp3");
@@ -1043,8 +1045,8 @@ function loadLevel(levelIndex) {
     player.frameX = 0;
     player.frameCounter = 0;
 
-    if (levelIndex === 2 || levelIndex === 6) {
-    health = 3; // reset health for final level
+    if (levelIndex === 2 || levelIndex === 6 || levelIndex === 9) {
+    health = 3; // reset health
     } else {
         health = 0; // no health display for earlier levels
     }
@@ -5247,6 +5249,34 @@ if (debugMode && currentDrag) {
             waterShoot.size,
             waterShoot.size
         );
+    }
+
+    // draw health and boss health bar level 10
+    if (currentLevel === 9) {
+
+        // draw hearts
+        for (let i = 0; i < health; i++) {
+            ctx.drawImage(heartSprite, 140 + (i * 60), 100, 70, 70);
+        }
+
+        // draw boss health bar
+        let barWidth = 600;
+        let barHeight = 30;
+
+        let x = (GAME_WIDTH / 2) - (barWidth / 2);
+        let y = 130;
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        let currentWidth = (octopusHealth / octopusMaxHealth) * barWidth;
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(x, y, currentWidth, barHeight);
+
+        ctx.fillStyle = "white";
+        ctx.font = "20px Arial";
+        ctx.fillText("Octopus: " + octopusHealth + " / " + octopusMaxHealth, x + 180, y + 22);
     }
 
         // draw player
