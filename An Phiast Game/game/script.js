@@ -1633,7 +1633,7 @@ window.addEventListener("keydown", function(event) {
 
         if (player.direction === "left") {
             direction = "left";
-        }
+        }   
 
         waterShoot = {
             x: player.x + player.size / 2,
@@ -1642,6 +1642,9 @@ window.addEventListener("keydown", function(event) {
             speed: 12,
             direction: direction
         };
+
+        shootSound.currentTime = 0;
+        shootSound.play();
 
         // reset animation
         waterShootFrameIndex = 0;
@@ -2682,6 +2685,17 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
             health--;
 
+            if (health <= 0) {
+                currentLevel = 7;
+                loadLevel(currentLevel);
+                octopusHealth = 150;
+
+                playerDeathSound.currentTime = 0;
+                playerDeathSound.play();
+
+                return;
+            }
+
             // reset player
             player.x = 190;
             player.y = 540;
@@ -2755,12 +2769,26 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                 playerHitSound.currentTime = 0;
                 playerHitSound.play();
 
+                health--; // lose life
+
+                // if no lives left go to lvl 8
+                if (health <= 0) {
+                    currentLevel = 7;
+                    loadLevel(currentLevel);
+                    octopusHealth = 150;
+
+                    playerDeathSound.currentTime = 0;
+                    playerDeathSound.play();
+
+                    return true;
+                }
+
                 // respawn player
                 player.x = 190;
                 player.y = 540;
                 velocityY = 0;
 
-                return true; // stops main loop from checking other enemies after a hit
+                return true;
             }
 
             return false;
