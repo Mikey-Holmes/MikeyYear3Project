@@ -2652,6 +2652,46 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
     }
 
+        // level 10 water shoot system
+    if (currentLevel === 9 && waterShoot) {
+
+        // move water shoot
+        if (waterShoot.direction === "right") {
+            waterShoot.x += waterShoot.speed * deltaTime;
+        } else {
+            waterShoot.x -= waterShoot.speed * deltaTime;
+        }
+
+        // better collision
+        if (octopus) {
+
+            const shootHitbox = {
+                x: waterShoot.x + 15,
+                y: waterShoot.y + 15,
+                size: waterShoot.size - 30
+            };
+
+            const octopusHitbox = {
+                x: octopus.x + 40,
+                y: octopus.y + 20,          
+                width: octopus.size - 80,
+                height: octopus.size - 40   
+            };
+
+            if (isColliding(shootHitbox, octopusHitbox)) {
+
+                octopusHealth -= 10;
+
+                if (octopusHealth < 0) {
+                    octopusHealth = 0;
+                }
+
+                // remove projectile after hit
+                waterShoot = null;
+            }
+        }
+    }
+
     // collision with walls for level 4
 if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
