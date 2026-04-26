@@ -653,6 +653,14 @@ let octopus = null;
 let octopusHealth = 150;
 let octopusMaxHealth = 150;
 
+let octopusStopTimer = 0;
+let octopusStopDelay = 300; // 5 seconds
+let octopusPauseTimer = 0;
+let octopusPaused = false;
+
+let octopusTargetX = 0;
+let octopusTargetY = 0;
+
 // water audio for level 10
 const underwaterSound = new Audio("assets/sounds/underwater.mp3");
 underwaterSound.loop = true;
@@ -1553,9 +1561,15 @@ function loadLevel(levelIndex) {
 
         octopus = {
             x: 1560,
-            y: 600,
-            size: 180
+            y: 550,
+            size: 180,
+            speed: 1.5
         };
+
+        //reset octopus attack
+        octopusStopTimer = 0;
+        octopusPauseTimer = 0;
+        octopusPaused = false;
 
     } else {
         orangeFish = null;
@@ -2568,6 +2582,119 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
             if (octopusFrameIndex >= octopusFrames.length) {
                 octopusFrameIndex = 0;
             }
+        }
+    }
+
+    // octopus movement and attack
+    if (currentLevel === 9 && octopus) {
+
+        // octopus dies
+        if (octopusHealth <= 0) {
+            octopus = null;
+            return;
+        }
+
+        // increase timer
+        if (!octopusPaused && octopusTargetX === 0 && octopusTargetY === 0) {
+                octopusStopTimer++;
+            }
+
+        // every 5 seconds pause
+        if (octopusStopTimer >= octopusStopDelay && !octopusPaused) {
+
+            octopusPaused = true;
+            octopusPauseTimer = 60; // 1 second
+
+            // save player position
+            octopusTargetX = player.x;
+            octopusTargetY = player.y;
+
+            octopusStopTimer = 0;
+        }
+
+        // if paused count down
+        if (octopusPaused) {
+
+            octopusPauseTimer--;
+
+            if (octopusPauseTimer <= 0) {
+                octopusPaused = false;
+            }
+
+        } else {
+
+            // movement
+
+            let targetX = player.x;
+            let targetY = player.y;
+
+            // if it just finished pausing go to saved position
+            if (octopusTargetX !== 0 || octopusTargetY !== 0) {
+                targetX = octopusTargetX;
+                targetY = octopusTargetY;
+            }
+
+            let dx = targetX - octopus.x;
+            let dy = targetY - octopus.y;
+
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            let moveSpeed = octopus.speed;
+
+            // if it has a saved target 
+            if (octopusTargetX !== 0 || octopusTargetY !== 0) {
+                moveSpeed = 10; // fast dash speed
+            }
+
+            if (distance > 1) {
+                octopus.x += (dx / distance) * moveSpeed * deltaTime;
+                octopus.y += (dy / distance) * moveSpeed * deltaTime;
+            }
+
+            // once it reaches saved position clear target
+            if (Math.abs(octopus.x - octopusTargetX) < 5 &&
+                Math.abs(octopus.y - octopusTargetY) < 5) {
+
+                octopusTargetX = 0;
+                octopusTargetY = 0;
+            }
+        }
+
+        const playerHitbox = {
+            x: player.x + 32,
+            y: player.y + 35,
+            size: player.size - 30
+        };
+
+        const octopusHitbox = {
+            x: octopus.x + 55,
+            y: octopus.y + 30,
+            width: octopus.size - 100,
+            height: octopus.size - 70
+        };
+
+
+        // collision with player
+        if (isColliding(playerHitbox, octopusHitbox)) {
+
+            playerHitSound.currentTime = 0;
+            playerHitSound.play();
+
+            health--;
+
+            // reset player
+            player.x = 190;
+            player.y = 540;
+
+            // reset octopus
+            octopus.x = 1560;
+            octopus.y = 550;
+
+            octopusTargetX = 0;
+            octopusTargetY = 0;
+            octopusPaused = false;
+
+            return;
         }
     }
 
