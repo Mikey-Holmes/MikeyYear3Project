@@ -2688,6 +2688,9 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
 
                 // remove projectile after hit
                 waterShoot = null;
+
+                enemyHitSound.currentTime = 0;
+                enemyHitSound.play();
             }
         }
     }
@@ -2909,7 +2912,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     }
 
     // crown collection lvl 10
-    if (currentLevel === 9 && crown && !crown.collected) {
+    if (currentLevel === 9 && octopusHealth <= 0 && crown && !crown.collected) {
 
         const playerHitbox = {
             x: player.x + 15,
@@ -2937,7 +2940,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
     }
 
     // animate bubbles lvl 10
-    if (currentLevel === 9 && crown && !crown.collected) {
+    if (currentLevel === 9 && octopusHealth <= 0) {
 
         bubbleFrameCounter++;
 
@@ -2949,7 +2952,7 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
                 bubbleFrameIndex = 0;
             }
         }
-    }
+}
 
     // pick up bow and spawn enemies in level 3
     if (bow && !bow.collected && isColliding(player, bow)) {
@@ -5236,6 +5239,7 @@ if (debugMode && currentDrag) {
     // draw crown level 10
     if (
         currentLevel === 9 &&
+        octopusHealth <= 0 &&
         crown &&
         !crown.collected &&
         crownSprite.complete
@@ -5260,14 +5264,17 @@ if (debugMode && currentDrag) {
 
         const bubbleSize = 60;
 
-        ctx.drawImage(
-            bubbleFrames[bubbleFrameIndex],
-            1628,
-            760,
-            bubbleSize,
-            bubbleSize
-        );
+        if (currentLevel === 9 && octopusHealth <= 0) {
+
+            ctx.drawImage(
+                bubbleFrames[bubbleFrameIndex],
+                1628,
+                760,
+                bubbleSize,
+                bubbleSize
+            );
     }
+}
 
     // draw octopus level 10
     if (currentLevel === 9 && octopus) {
