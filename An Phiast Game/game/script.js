@@ -680,6 +680,19 @@ let waterShootFrameCounter = 0;
 let waterShootFrameDelay = 10;
 let waterShoot = null;
 
+// seaweed animation lvl 10
+const seaweedFrames = [];
+
+for (let i = 1; i <= 4; i++) {
+    const img = new Image();
+    img.src = "assets/images/seaweed_" + i + ".png";
+    seaweedFrames.push(img);
+}
+
+let seaweedFrameIndex = 0;
+let seaweedFrameCounter = 0;
+let seaweedFrameDelay = 26;
+
 
 
 
@@ -3109,6 +3122,21 @@ if (currentLevel === 3 || currentLevel === 4 || currentLevel === 5) {
         }
 }
 
+    // animate seaweed level 10
+    if (currentLevel === 9) {
+
+        seaweedFrameCounter++;
+
+        if (seaweedFrameCounter >= seaweedFrameDelay) {
+            seaweedFrameCounter = 0;
+            seaweedFrameIndex++;
+
+            if (seaweedFrameIndex >= seaweedFrames.length) {
+                seaweedFrameIndex = 0;
+            }
+        }
+    }
+
     // pick up bow and spawn enemies in level 3
     if (bow && !bow.collected && isColliding(player, bow)) {
         bow.collected = true;
@@ -5204,6 +5232,32 @@ if (debugMode && currentDrag) {
             purpleSpiderLvl9.y,
             purpleSpiderLvl9.size,
             purpleSpiderLvl9.size
+        );
+    }
+
+    // draw seaweed
+    if (
+        currentLevel === 9 &&
+        seaweedFrames[seaweedFrameIndex] &&
+        seaweedFrames[seaweedFrameIndex].complete
+    ) {
+
+        const img = seaweedFrames[seaweedFrameIndex];
+
+        const scale = 0.6; // adjusted to fit properly
+
+        const seaweedWidth = img.width * scale;
+        const seaweedHeight = img.height * scale;
+
+        const seaweedX = (GAME_WIDTH - seaweedWidth) / 2;
+        const seaweedY = GAME_HEIGHT - seaweedHeight - 180;
+
+        ctx.drawImage(
+            img,
+            seaweedX,
+            seaweedY,
+            seaweedWidth,
+            seaweedHeight
         );
     }
 
